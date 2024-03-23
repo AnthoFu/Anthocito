@@ -3,7 +3,9 @@
 const Discord = require("discord.js"); //Libreria necesaria para poder ejecutar procesos de Discord
 const { Client, Collection } = require("discord.js"); // Eventos y constantes necesarias para funcionar 
 const client = new Client ({ intents: 3276799 }) //Intents de administrador para el bot, basicamente todos los permisos
-const { loadSlash } = require("./handlers/slashHandler")
+const { loadSlash } = require("./handlers/slashHandler"); //Importa la funcion de manejo de slash commands
+
+
 require("dotenv").config(); //Libreria requerida para poder guardar el token del bot en un archivo oculto (.env)
 
 client.on("interactionCreate" , async (interaction) => { //Creacion de los slash commands
@@ -39,9 +41,9 @@ client.on("ready" , async () => { //Evento al prender el bot
     await loadSlash(client)
     .then(()=>{
         console.log(" | Comandos cargado con exito! :D ");
+        console.log(` | Bot encendido y en funcionamiento como: ${client.user.tag}`)
     })
     .catch((err) =>{
         console.error(` | Error al cargar los comandos, ahora que hiciste mal Antho? :( => ${err}`);
-    console.log(` | Bot encendido y en funcionamiento como: ${client.user.tag}`)
     })
 })
