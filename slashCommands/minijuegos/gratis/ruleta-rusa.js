@@ -1,3 +1,5 @@
+/*Este comando actualmente no funciona correctamente */
+
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
 module.exports = {
