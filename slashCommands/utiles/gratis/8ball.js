@@ -36,5 +36,7 @@ module.exports = {
             .setDescription(`|Pregunta para: ${client.user.username}\n\n**Pregunta:** ${pgr} \n\n**Respuesta:** ${botRespuesta}`);
 
         await interaction.reply({ embeds: [embed] });
+
+        console.log(` | Se ha utilizado el comando ${this.name}`)
     }
 };

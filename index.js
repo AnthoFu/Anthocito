@@ -24,7 +24,7 @@ loadEvents(client)
 client.on("ready" , async () => { //Evento al prender el bot
     await loadSlash(client)
     .then(()=>{
-        console.log(" | Comandos cargado con exito! :D ");
+        console.log(` | ¡Comandos cargado con exito! :D Puedes revisar los comandos en la carpeta slashCommands `);
         console.log(` | Bot encendido y en funcionamiento como: ${client.user.tag}`)
     })
     .catch((err) =>{

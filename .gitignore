@@ -1,0 +1,11 @@
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+
+# Logs
+logs/
+
+# Optional: package-lock.json (uncomment if you want to ignore it)
+# package-lock.json

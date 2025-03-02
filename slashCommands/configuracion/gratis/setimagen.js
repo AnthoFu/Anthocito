@@ -33,6 +33,7 @@ module.exports = {
             console.error(error);
             // En caso de error, envía una respuesta de error
             await interaction.editReply({ content: "Ocurrió un error al intentar cambiar la imagen." });
+            console.log(` | Se ha utilizado el comando ${this.name}`)
         }
     }
 };

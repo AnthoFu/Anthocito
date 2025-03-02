@@ -6,7 +6,7 @@ module.exports = {
 
     async execute(client, interaction) {
 
-        console.log (" |Estado del bot cargado con exito. :3")
+        console.log (` |Estado del bot cargado con exito. :3 Se puede modificar el archivo en status.js`)
 
         let statusarray =[
             {
@@ -15,15 +15,15 @@ module.exports = {
             status: "online"
         },
         {
-            name: "a antho sufrir mientras programa",
+            name: "a Antho sufrir mientras programa",
             type: ActivityType.Watching,
-            status:"DoNotDisturb"
+            status:"online"
         },
 
         {
-            name: "hacer sufrir a Antho.",
+            name: "en hacer sufrir a Antho.",
             type: ActivityType.Competing,
-            status: "idle"
+            status: "online"
         }
     ]
 
@@ -39,6 +39,6 @@ module.exports = {
             }],
             status: statusarray[option].status
         })
-    },50000)//5000 ~ 5 segundos
+    },300000)//1000 ~ 1 segundo - 300000 = 300 segundos o 5 minutos.
     }
 }

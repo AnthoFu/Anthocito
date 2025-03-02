@@ -1,4 +1,4 @@
-/*Este comando actualmente no funciona correctamente */
+/* Este comando ha sido corregido para funcionar correctamente */
 
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
@@ -69,7 +69,7 @@ async function iniciarJuego(interaction, jugador1, jugador2) {
     };
 
     let turnoDe = Math.random() < 0.5 ? jugador1 : jugador2;  // Elige un jugador al azar para empezar
-    let balaEnRecamara = Math.floor(Math.random() * 6) + 1;  // Posición de la bala en la recámara
+    let balaEnRecamara = Math.floor(Math.random() * 6);  // Posición de la bala en la recámara (0-5)
     let posicionActual = Math.floor(Math.random() * 6) + 1;
 
     await interaction.followUp({
@@ -162,9 +162,10 @@ async function cicloDeTurnos(interaction, jugador1, jugador2, turnoDe, vidas, ba
         }
 
         // Comprobamos si ambos jugadores han perdido todas sus vidas (empate)
-        if (vidas[jugador1.id] === 0 && vidas[jugador2.id] === 0) {
+        if (vidas[jugador1.id] === 0 || vidas[jugador2.id] === 0) {
+            const ganador = vidas[jugador1.id] > 0 ? jugador1 : jugador2;
             await interaction.followUp({
-                content: `¡Ambos jugadores han perdido todas sus vidas! ¡Es un empate!`,
+                content: `¡El juego ha terminado! ${ganador.username} ha ganado.`,
                 components: []
             });
             return;
@@ -193,16 +194,8 @@ async function cicloDeTurnos(interaction, jugador1, jugador2, turnoDe, vidas, ba
             });
             vidas[turnoDe.id]--;  // El jugador que no respondió pierde una vida
 
-            // Comprobamos si ambos jugadores han perdido todas sus vidas (empate)
-            if (vidas[jugador1.id] === 0 && vidas[jugador2.id] === 0) {
-                await interaction.followUp({
-                    content: `¡Ambos jugadores han perdido todas sus vidas! ¡Es un empate!`,
-                    components: []
-                });
-                return;
-            }
+        // Comprobamos si algún jugador perdió todas las vidas
 
-            // Comprobamos si algún jugador perdió todas las vidas
             if (vidas[jugador1.id] === 0 || vidas[jugador2.id] === 0) {
                 const ganador = vidas[jugador1.id] > 0 ? jugador1 : jugador2;
                 await interaction.followUp({

@@ -37,5 +37,6 @@ module.exports = {
         })
 
         await interaction.reply ({ content: "El banner ha sido cambiado con exito, ya sabia que eras god antho. uwu"})
+        console.log(` | Se ha utilizado el comando ${this.name}`)
     }
 }

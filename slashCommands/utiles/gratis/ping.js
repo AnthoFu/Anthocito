@@ -13,5 +13,7 @@ module.exports = {
         .setDescription(`Ping => ${ping}`)
 
         interaction.reply({ embeds: [embed] })
+        
+        console.log(` | Se ha utilizado el comando ${this.name}`)
     }
 }

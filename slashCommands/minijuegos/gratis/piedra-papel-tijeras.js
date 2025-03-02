@@ -61,5 +61,6 @@ module.exports = {
 			// Si se agota el tiempo sin que el usuario elija
 			await interaction.editReply({ content: "Eh... ¿Hola? ¿Sigues ahí? Se te acabo el tiempo... ¡Tontito!", components: [] });
 		}
+		console.log(` | Se ha utilizado el comando ${this.name}`)
 	}
 };
