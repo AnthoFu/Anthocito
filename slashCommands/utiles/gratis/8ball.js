@@ -18,13 +18,13 @@ module.exports = {
         var respuestas = [
             "¡Sí!", 
             "No. o.o", 
-            "No lo creo... <:en:1098945556459560970>", 
+            "No lo creo...", 
             "De hecho, hay un comic en chochox que lo explica <:fansdeoswucuando:1194025148089630850>", 
             "No lo sé, ¡Vuelve a preguntar! >.<", 
             "... Pregúntale a Antho", 
             "Obviamente, duh", 
-            "¡Claro que no! ¿Cómo se te ocurre? put- <:callatenegro:1185273729278816296>", 
-            "Yo creo que sí... <:en:1098945556459560970>",
+            "¡Claro que no! ¿Cómo se te ocurre?", 
+            "Yo creo que sí...",
             "Nuh uh!",
             "Yuh uh!"
         ];

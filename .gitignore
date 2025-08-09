@@ -1,11 +1,14 @@
-# Node modules
-node_modules/
-
-# Environment variables
+# Entorno
 .env
 
-# Logs
-logs/
+# Dependencias
+/node_modules
 
-# Optional: package-lock.json (uncomment if you want to ignore it)
-# package-lock.json
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Sistema Operativo
+.DS_Store
+Thumbs.db
