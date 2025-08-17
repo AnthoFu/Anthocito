@@ -15,6 +15,5 @@ module.exports = {
     async execute(client, interaction) {
         const botRespuesta = interaction.options.getString("mensaje");
         await interaction.reply(botRespuesta);
-        console.log (` | Se ha utilizado el comando ${this.name}.`)
     }
 }

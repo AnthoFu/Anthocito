@@ -56,9 +56,6 @@ module.exports = {
             await canal.bulkDelete(cantidad, true).then(messages => {
                 interaction.reply({content: `Se han borrado ${messages.size} mensajes del canal ${canal} Awebo que sí`})
             })
-
-            console.log(` | Se ha utilizado el comando ${this.name}`)
-
         }
     }
 }

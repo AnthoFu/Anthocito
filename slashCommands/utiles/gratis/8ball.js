@@ -18,13 +18,13 @@ module.exports = {
         var respuestas = [
             "¡Sí!", 
             "No. o.o", 
-            "No lo creo...", 
-            "De hecho, hay un comic en chochox que lo explica <:fansdeoswucuando:1194025148089630850>", 
+            "No lo creo... :P", 
+            "De hecho, hay un comic en chochox que lo explica. 🤓☝️", 
             "No lo sé, ¡Vuelve a preguntar! >.<", 
             "... Pregúntale a Antho", 
             "Obviamente, duh", 
             "¡Claro que no! ¿Cómo se te ocurre?", 
-            "Yo creo que sí...",
+            "Yo creo que sí... o.o",
             "Nuh uh!",
             "Yuh uh!"
         ];
@@ -36,7 +36,5 @@ module.exports = {
             .setDescription(`|Pregunta para: ${client.user.username}\n\n**Pregunta:** ${pgr} \n\n**Respuesta:** ${botRespuesta}`);
 
         await interaction.reply({ embeds: [embed] });
-
-        console.log(` | Se ha utilizado el comando ${this.name}`)
     }
 };

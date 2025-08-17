@@ -9,6 +9,8 @@ module.exports = {
             const cmd = client.slashCommands.get(interaction.commandName);
             if(!cmd) return;
 
+            console.log(` | El usuario "${interaction.user.tag}" ejecutó el comando: /${interaction.commandName}`);
+
             const args = []
             for(let option of interaction.options.data){
                 if(option.type === 1){
