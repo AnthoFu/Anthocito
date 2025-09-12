@@ -1,5 +1,3 @@
-const {EmbedBuilder} = require("discord.js");
-
 module.exports = {
     name: "say",
     description: "El bot dirá lo que tú quieras.",
@@ -16,4 +14,4 @@ module.exports = {
         const botRespuesta = interaction.options.getString("mensaje");
         await interaction.reply(botRespuesta);
     }
-}
+};

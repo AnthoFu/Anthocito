@@ -1,5 +1,3 @@
-const { EmbedBuilder } = require("discord.js");
-
 module.exports = {
     name: "setimagen",
     description: "Poner una imagen animada al bot",
@@ -7,15 +5,16 @@ module.exports = {
         {
             name: "imagen",
             description: "Selecciona la imagen",
-            type: 11, // Attachment type
+            type: 11, // Tipo de adjunto
             required: true
         }
     ],
 
     async execute(client, interaction) {
         // Verificar si el ID del usuario coincide con tu ID
-        if (interaction.user.id !== '459569274697285642') {
-            return interaction.reply({ content: "No tienes permiso para usar este comando.", ephemeral: true });
+        if (interaction.user.id !== "459569274697285642") {
+            await interaction.reply({ content: "No tienes permiso para usar este comando.", ephemeral: true });
+            return;
         }
 
         const avatar = interaction.options.getAttachment("imagen");
@@ -28,12 +27,14 @@ module.exports = {
             await client.user.setAvatar(avatar.url);
 
             // Enviar la respuesta una vez que el avatar ha sido cambiado
-            await interaction.editReply({ content: "La imagen ha sido cargada con éxito, felicidades, eres un genio (Mentira)" });
+            await interaction.editReply({
+                content: "La imagen ha sido cargada con éxito, felicidades, eres un genio (Mentira)"
+            });
         } catch (error) {
             console.error(error);
             // En caso de error, envía una respuesta de error
             await interaction.editReply({ content: "Ocurrió un error al intentar cambiar la imagen." });
-            console.log(` | Se ha utilizado el comando ${this.name}`)
+            console.log(` | Se ha utilizado el comando ${this.name}`);
         }
     }
 };

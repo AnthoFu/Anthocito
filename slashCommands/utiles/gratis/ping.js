@@ -4,14 +4,11 @@ module.exports = {
     name: "ping",
     description: "Comando para saber la latencia con el bot",
 
-    async execute(client, interaction){
-        
-        let ping = Date.now() - interaction.createdTimestamp;
+    async execute(client, interaction) {
+        const ping = Date.now() - interaction.createdTimestamp;
 
-        const embed = new EmbedBuilder()
-        .setColor("Purple")
-        .setDescription(`Ping => ${ping}`)
+        const embed = new EmbedBuilder().setColor("Purple").setDescription(`Ping => ${ping}`);
 
-        interaction.reply({ embeds: [embed] })
+        interaction.reply({ embeds: [embed] });
     }
-}
+};
