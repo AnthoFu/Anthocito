@@ -81,9 +81,7 @@ async function nextTurn(game) {
             const timeoutEmbed = new EmbedBuilder()
                 .setTitle("⏰ ¡Tiempo agotado!")
                 .setColor("#E74C3C")
-                .setDescription(
-                    `**${eliminatedPlayer.username}** no actuó a tiempo ` + "y ha sido eliminado por cobarde."
-                );
+                .setDescription(`**${eliminatedPlayer.username}** no actuó a tiempo y ha sido eliminado por cobarde.`);
 
             game.message.channel.send({ embeds: [timeoutEmbed] });
 
