@@ -1,6 +1,7 @@
 // Archivo principal de Anthocito, este es mi tercer intento XD//
 
 const { Client, Collection } = require("discord.js");
+const express = require("express");
 // Eventos y constantes necesarias para funcionar
 const client = new Client({ intents: 3276799 });
 // Intents de administrador para el bot, basicamente todos los permisos
@@ -26,4 +27,16 @@ client.on("ready", async () => {
         .catch((err) => {
             console.error(` | Error al cargar los comandos, ahora que hiciste mal Antho? :( => ${err}`);
         });
+});
+
+// --- Servidor Web Express para mantener el bot activo 24/7 ---
+const app = express();
+const port = process.env.PORT || 3000;
+
+app.get("/", (req, res) => {
+    res.send("¡El bot está en línea y funcionando!");
+});
+
+app.listen(port, () => {
+    console.log(` | Servidor web escuchando en el puerto ${port}`);
 });
