@@ -7,12 +7,14 @@ const client = new Client({ intents: 3276799 });
 // Intents de administrador para el bot, basicamente todos los permisos
 const { loadSlash } = require("./handlers/slashHandler"); // Importa la funcion de manejo de slash commands
 const { loadEvents } = require("./handlers/eventHandler"); // Importa la funcion de manejo de eventos
+const { loadDatabase } = require("./handlers/databaseHandler"); // Importa la funcion de manejo de la base de datos
 
 require("dotenv").config(); // Libreria requerida para poder guardar el token del bot en un archivo oculto (.env)
 
 client.slashCommands = new Collection(); // Recoleccion al crear un nuevo Slash Command :)
 
 (async () => {
+    await loadDatabase(); // Iniciamos la conexión con MongoDB antes que todo :)
     await client.login(process.env.TOKEN).catch((err) => console.error(` | Error al iniciar el bot :( => ${err}`));
 })();
 
