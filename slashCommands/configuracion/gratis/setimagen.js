@@ -11,8 +11,8 @@ module.exports = {
     ],
 
     async execute(client, interaction) {
-        // Verificar si el ID del usuario coincide con tu ID
-        if (interaction.user.id !== "459569274697285642") {
+        // Verificar si el ID del usuario coincide con el SUPER_ADMIN_ID en el .env
+        if (interaction.user.id !== process.env.SUPER_ADMIN_ID) {
             await interaction.reply({ content: "No tienes permiso para usar este comando.", ephemeral: true });
             return;
         }
