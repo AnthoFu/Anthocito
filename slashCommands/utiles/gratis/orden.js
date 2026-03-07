@@ -94,7 +94,7 @@ module.exports = {
 
             const embed = new EmbedBuilder()
                 .setTitle("✅ Orden Registrada")
-                .setDescription("Tu orden ha sido registrada correctamente y está a la espera de aprobación.")
+                .setDescription(`<@${interaction.user.id}> ha registrado una nueva orden. Pendiente de aprobación.`)
                 .addFields(
                     { name: "ID de la Orden", value: `\`${newOrder.id}\``, inline: true },
                     { name: "Fecha", value: fecha, inline: true },
@@ -108,7 +108,7 @@ module.exports = {
                 embed.addFields({ name: "Colaborador", value: collaboratorName, inline: true });
             }
 
-            return interaction.reply({ embeds: [embed], ephemeral: true });
+            return interaction.reply({ embeds: [embed] });
         }
 
         if (subcommand === "mis-ordenes") {
@@ -120,7 +120,10 @@ module.exports = {
                 return interaction.reply({ content: "No tienes ninguna orden registrada.", ephemeral: true });
             }
 
-            const embed = new EmbedBuilder().setTitle("📝 Mis Órdenes").setColor("Blue").setTimestamp();
+            const embed = new EmbedBuilder()
+                .setTitle(`📝 Órdenes de ${interaction.user.tag}`)
+                .setColor("Blue")
+                .setTimestamp();
 
             orders.forEach((order) => {
                 const statusEmoji = {
@@ -137,7 +140,7 @@ module.exports = {
                 });
             });
 
-            return interaction.reply({ embeds: [embed], ephemeral: true });
+            return interaction.reply({ embeds: [embed] });
         }
 
         if (subcommand === "vouch") {
@@ -164,19 +167,20 @@ module.exports = {
             await order.save();
 
             const vouchEmbed = new EmbedBuilder()
-                .setTitle("⭐ Nuevo Vouch Recibido")
+                .setTitle("⭐ ¡Nuevo Vouch! ⭐")
                 .setColor("Gold")
-                .setDescription(`${comentario}`)
+                .setDescription(`"${comentario}"`)
                 .addFields(
-                    { name: "Usuario", value: `<@${order.userId}>`, inline: true },
-                    { name: "Monto Recibido", value: `$${order.netPayout.toFixed(2)}`, inline: true },
-                    { name: "Orden ID", value: `\`${order.id}\``, inline: true }
+                    { name: "👤 Usuario", value: `<@${order.userId}>`, inline: true },
+                    { name: "💰 Monto Recibido", value: `$${order.netPayout.toFixed(2)}`, inline: true },
+                    { name: "📝 Orden ID", value: `\`${order.id}\``, inline: true }
                 )
                 .setTimestamp()
-                .setThumbnail(interaction.user.displayAvatarURL());
+                .setThumbnail(interaction.user.displayAvatarURL())
+                .setFooter({ text: "Gracias por confiar en nuestro servicio." });
 
             return interaction.reply({
-                content: "✅ ¡Gracias por tu vouch! La orden ha sido finalizada.",
+                content: `🎉 ¡Gracias <@${interaction.user.id}> por tu confianza!`,
                 embeds: [vouchEmbed]
             });
         }
