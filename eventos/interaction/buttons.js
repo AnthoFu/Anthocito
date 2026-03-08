@@ -79,7 +79,9 @@ module.exports = {
             try {
                 const user = await client.users.fetch(order.userId);
                 await user.send({
-                    content: `🎉 ¡Tu orden de cashback ha sido **aprobada**!\n**Monto Neto:** $${netPayout.toFixed(2)}\nEl pago se procesará en un máximo de 72 horas.`
+                    content: `🎉 ¡Tu orden de cashback ha sido **aprobada**!\n**Monto Neto:** $${netPayout.toFixed(
+                        2
+                    )}\n\nPronto recibirás una notificación cuando tu pago sea procesado. ¡Gracias por tu paciencia!`
                 });
             } catch (err) {
                 console.log(`No se pudo enviar MD al usuario ${order.userId}`);

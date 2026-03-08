@@ -72,6 +72,53 @@ module.exports = {
             modal.addComponents(firstActionRow);
 
             await interaction.showModal(modal);
+        } else if (interaction.customId === "seleccionar_orden_pagar") {
+            const orderId = interaction.values[0];
+            const order = await OrderSchema.findById(orderId);
+
+            if (!order) {
+                await interaction.update({ content: "Esta orden ya no existe.", components: [], embeds: [] });
+                return;
+            }
+
+            if (order.status !== "aprobada") {
+                await interaction.update({
+                    content: `⚠️ Esta orden no está aprobada. Estado actual: **${order.status}**.`,
+                    components: [],
+                    embeds: []
+                });
+                return;
+            }
+
+            order.status = "pagada";
+            order.paidAt = new Date();
+            await order.save();
+
+            const embed = new EmbedBuilder()
+                .setTitle("💰 Pago Registrado")
+                .setDescription(`La orden \`${order.id}\` de **${order.userName}** ha sido marcada como **PAGADA**.`)
+                .setColor("Green")
+                .addFields({ name: "Monto Neto Pagado", value: `$${order.netPayout.toFixed(2)}` });
+
+            await interaction.update({ embeds: [embed], components: [] });
+
+            // Notificar al usuario que su pago fue procesado
+            try {
+                const user = await interaction.client.users.fetch(order.userId);
+                await user.send({
+                    content: `💸 ¡Tu pago ha sido enviado!\n**Monto:** $${order.netPayout.toFixed(
+                        2
+                    )}\n**Orden ID:** \`${
+                        order.id
+                    }\`\n\nDeberías verlo reflejado en tu cuenta en las próximas 72 horas. Una vez que recibas el monto, por favor, confírmalo usando el comando \`/orden vouch\`. ¡Gracias por tu confianza!`
+                });
+            } catch (err) {
+                console.log(`Error al notificar al usuario ${order.userId}:`, err);
+                await interaction.followUp({
+                    content: `No se pudo notificar al usuario ${order.userName} por MD.`,
+                    ephemeral: true
+                });
+            }
         }
     }
 };

@@ -16,12 +16,7 @@ module.exports = {
             subcommand.setName("panel").setDescription("Muestra el panel de gestión de órdenes pendientes.")
         )
         .addSubcommand((subcommand) =>
-            subcommand
-                .setName("pagar")
-                .setDescription("Marca una orden como pagada.")
-                .addStringOption((option) =>
-                    option.setName("id").setDescription("ID de la orden a pagar.").setRequired(true)
-                )
+            subcommand.setName("panel-pagos").setDescription("Muestra el panel para pagar órdenes aprobadas.")
         ),
 
     async execute(client, interaction) {
@@ -62,32 +57,42 @@ module.exports = {
             return interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
         }
 
-        if (subcommand === "pagar") {
-            const id = interaction.options.getString("id");
-            const order = await OrderSchema.findById(id);
+        if (subcommand === "panel-pagos") {
+            const orders = await OrderSchema.find({ guildId: interaction.guild.id, status: "aprobada" }).limit(25);
 
-            if (!order) {
-                return interaction.reply({ content: "❌ No se encontró ninguna orden con ese ID.", ephemeral: true });
-            }
-
-            if (order.status !== "aprobada") {
+            if (orders.length === 0) {
                 return interaction.reply({
-                    content: `⚠️ Solo puedes pagar órdenes **aprobadas**. Estado actual: **${order.status}**.`,
+                    content: "No hay órdenes aprobadas pendientes de pago. ✅",
                     ephemeral: true
                 });
             }
 
-            order.status = "pagada";
-            order.paidAt = new Date();
-            await order.save();
-
             const embed = new EmbedBuilder()
-                .setTitle("💰 Pago Registrado")
-                .setDescription(`La orden \`${order.id}\` de **${order.userName}** ha sido marcada como **PAGADA**.`)
-                .setColor("Green")
-                .addFields({ name: "Monto Neto", value: `$${order.netPayout.toFixed(2)}` });
+                .setTitle("💵 Panel de Pagos: Órdenes Aprobadas")
+                .setDescription("Selecciona una orden del menú para marcarla como **pagada**.")
+                .setColor("Gold")
+                .setTimestamp();
 
-            return interaction.reply({ embeds: [embed], ephemeral: true });
+            const selectMenu = new StringSelectMenuBuilder()
+                .setCustomId("seleccionar_orden_pagar")
+                .setPlaceholder("Elige una orden para pagar...");
+
+            orders.forEach((order) => {
+                embed.addFields({
+                    name: `✅ Orden #${order.id.toString().slice(-6)}`,
+                    value: `**Usuario:** ${order.userName}\n**Neto a Pagar:** $${order.netPayout.toFixed(2)}`
+                });
+
+                selectMenu.addOptions({
+                    label: `Orden #${order.id.toString().slice(-6)} - ${order.userName}`,
+                    description: `Neto a Pagar: $${order.netPayout.toFixed(2)}`,
+                    value: order.id.toString()
+                });
+            });
+
+            const row = new ActionRowBuilder().addComponents(selectMenu);
+
+            return interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
         }
 
         return null;
