@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder } = require("discord.js");
 const OrderSchema = require("../../../models/OrderSchema");
 
 module.exports = {
@@ -32,12 +32,6 @@ module.exports = {
             subcommand
                 .setName("vouch")
                 .setDescription("Confirma que has recibido tu pago.")
-                .addStringOption((option) =>
-                    option
-                        .setName("id")
-                        .setDescription("ID de la orden (puedes verlo en /orden mis-ordenes).")
-                        .setRequired(true)
-                )
                 .addStringOption((option) =>
                     option
                         .setName("comentario")
@@ -144,44 +138,35 @@ module.exports = {
         }
 
         if (subcommand === "vouch") {
-            const id = interaction.options.getString("id");
-            const comentario = interaction.options.getString("comentario") || "¡Pago recibido correctamente! Gracias.";
+            const ordersToVouch = await OrderSchema.find({
+                userId: interaction.user.id,
+                status: "pagada"
+            });
 
-            const order = await OrderSchema.findOne({ _id: id, userId: interaction.user.id });
-
-            if (!order) {
+            if (ordersToVouch.length === 0) {
                 return interaction.reply({
-                    content: "No se encontró ninguna orden con ese ID o no te pertenece.",
+                    content: "No tienes órdenes pagadas para hacer un vouch.",
                     ephemeral: true
                 });
             }
 
-            if (order.status !== "pagada") {
-                return interaction.reply({
-                    content: `Solo puedes hacer un vouch para órdenes con estado **PAGADA**. Estado actual: **${order.status}**.`,
-                    ephemeral: true
-                });
-            }
+            const options = ordersToVouch.map((order) => ({
+                label: `Orden #${order.id.toString().slice(-6)}`,
+                description: `Valor: $${order.totalValue}, Pagado: $${order.netPayout.toFixed(2)}`,
+                value: `vouch_${order.id}`
+            }));
 
-            order.status = "finalizada";
-            await order.save();
+            const selectMenu = new StringSelectMenuBuilder()
+                .setCustomId("vouch_select_menu")
+                .setPlaceholder("Selecciona una orden para hacer el vouch")
+                .addOptions(options);
 
-            const vouchEmbed = new EmbedBuilder()
-                .setTitle("⭐ ¡Nuevo Vouch! ⭐")
-                .setColor("Gold")
-                .setDescription(`"${comentario}"`)
-                .addFields(
-                    { name: "👤 Usuario", value: `<@${order.userId}>`, inline: true },
-                    { name: "💰 Monto Recibido", value: `$${order.netPayout.toFixed(2)}`, inline: true },
-                    { name: "📝 Orden ID", value: `\`${order.id}\``, inline: true }
-                )
-                .setTimestamp()
-                .setThumbnail(interaction.user.displayAvatarURL())
-                .setFooter({ text: "Gracias por confiar en nuestro servicio." });
+            const row = new ActionRowBuilder().addComponents(selectMenu);
 
             return interaction.reply({
-                content: `🎉 ¡Gracias <@${interaction.user.id}> por tu confianza!`,
-                embeds: [vouchEmbed]
+                content: "Tienes las siguientes órdenes listas para hacer vouch. Por favor, selecciona una:",
+                components: [row],
+                ephemeral: true
             });
         }
 

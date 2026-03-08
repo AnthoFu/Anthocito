@@ -1,4 +1,12 @@
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+const {
+    EmbedBuilder,
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    ModalBuilder,
+    TextInputBuilder,
+    TextInputStyle
+} = require("discord.js");
 const OrderSchema = require("../../models/OrderSchema");
 
 module.exports = {
@@ -47,6 +55,23 @@ module.exports = {
             );
 
             await interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
+        } else if (interaction.customId === "vouch_select_menu") {
+            const selectedValue = interaction.values[0];
+            const orderId = selectedValue.split("_")[1];
+
+            const modal = new ModalBuilder().setCustomId(`vouch_modal_${orderId}`).setTitle("Finalizar Vouch");
+
+            const commentInput = new TextInputBuilder()
+                .setCustomId("vouch_comment")
+                .setLabel("Comentario del Vouch")
+                .setStyle(TextInputStyle.Paragraph)
+                .setPlaceholder("¡Pago recibido correctamente! Gracias.")
+                .setRequired(false);
+
+            const firstActionRow = new ActionRowBuilder().addComponents(commentInput);
+            modal.addComponents(firstActionRow);
+
+            await interaction.showModal(modal);
         }
     }
 };

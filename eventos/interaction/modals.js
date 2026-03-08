@@ -114,5 +114,49 @@ module.exports = {
                 console.log(`No se pudo enviar MD al usuario ${order.userId}`);
             }
         }
+        if (interaction.customId.startsWith("vouch_modal_")) {
+            const orderId = interaction.customId.split("_")[2];
+            const comentario =
+                interaction.fields.getTextInputValue("vouch_comment") || "¡Pago recibido correctamente! Gracias.";
+
+            const order = await OrderSchema.findOne({ _id: orderId, userId: interaction.user.id });
+
+            if (!order) {
+                await interaction.reply({
+                    content: "No se encontró ninguna orden con ese ID o no te pertenece.",
+                    ephemeral: true
+                });
+                return;
+            }
+
+            if (order.status !== "pagada") {
+                await interaction.reply({
+                    content: `Solo puedes hacer un vouch para órdenes con estado **PAGADA**. Estado actual: **${order.status}**.`,
+                    ephemeral: true
+                });
+                return;
+            }
+
+            order.status = "finalizada";
+            await order.save();
+
+            const vouchEmbed = new EmbedBuilder()
+                .setTitle("⭐ ¡Nuevo Vouch! ⭐")
+                .setColor("Gold")
+                .setDescription(`"${comentario}"`)
+                .addFields(
+                    { name: "👤 Usuario", value: `<@${order.userId}>`, inline: true },
+                    { name: "💰 Monto Recibido", value: `$${order.netPayout.toFixed(2)}`, inline: true },
+                    { name: "📝 Orden ID", value: `\`${order.id}\``, inline: true }
+                )
+                .setTimestamp()
+                .setThumbnail(interaction.user.displayAvatarURL())
+                .setFooter({ text: "Gracias por confiar en nuestro servicio." });
+
+            await interaction.reply({
+                content: `🎉 ¡Gracias <@${interaction.user.id}> por tu confianza!`,
+                embeds: [vouchEmbed]
+            });
+        }
     }
 };
