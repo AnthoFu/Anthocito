@@ -6,7 +6,9 @@ module.exports = {
         .setName("setwelcome")
         .setDescription("Configura el sistema de bienvenidas del servidor.")
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-        .addBooleanOption((option) => option.setName("estado").setDescription("Activar o desactivar el sistema de bienvenidas.").setRequired(true))
+        .addBooleanOption((option) =>
+            option.setName("estado").setDescription("Activar o desactivar el sistema de bienvenidas.").setRequired(true)
+        )
         .addChannelOption((option) =>
             option
                 .setName("canal")
@@ -49,11 +51,15 @@ module.exports = {
             .setDescription(`Se ha actualizado la configuración de las bienvenidas en **${guild.name}**.`)
             .addFields(
                 { name: "Estado", value: estado ? "✅ Activado" : "❌ Desactivado", inline: true },
-                { name: "Canal", value: welcomeData.channelId ? `<#${welcomeData.channelId}>` : "No configurado", inline: true },
+                {
+                    name: "Canal",
+                    value: welcomeData.channelId ? `<#${welcomeData.channelId}>` : "No configurado",
+                    inline: true
+                },
                 { name: "Mensaje", value: welcomeData.message }
             )
             .setTimestamp();
 
         return interaction.reply({ embeds: [embed], ephemeral: true });
-    },
+    }
 };

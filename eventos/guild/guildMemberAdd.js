@@ -26,6 +26,8 @@ module.exports = {
             .setFooter({ text: `Miembro #${member.guild.memberCount}`, iconURL: member.guild.iconURL() });
 
         // Enviar al canal
-        channel.send({ content: `<@${member.user.id}>`, embeds: [embed] }).catch((err) => console.error(` | [Error] No se pudo enviar el mensaje de bienvenida: ${err}`));
-    },
+        channel
+            .send({ content: `<@${member.user.id}>`, embeds: [embed] })
+            .catch((err) => console.error(` | [Error] No se pudo enviar el mensaje de bienvenida: ${err}`));
+    }
 };

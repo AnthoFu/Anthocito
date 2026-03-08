@@ -7,7 +7,7 @@ async function loadDatabase() {
     const mongoURI = process.env.MONGODB_URI;
 
     if (!mongoURI) {
-        return console.warn(" | [MongoDB] No se ha proporcionado una MONGODB_URI en el archivo .env.");
+        console.warn(" | [MongoDB] No se ha proporcionado una MONGODB_URI en el archivo .env.");
     }
 
     try {

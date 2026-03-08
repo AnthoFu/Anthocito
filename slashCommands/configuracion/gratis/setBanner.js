@@ -39,12 +39,14 @@ module.exports = {
                 body: JSON.stringify({ banner: imageData })
             });
 
-            await interaction.editReply({ content: "El banner ha sido cambiado con exito, ya sabia que eras god antho. uwu" });
+            await interaction.editReply({
+                content: "El banner ha sido cambiado con exito, ya sabia que eras god antho. uwu"
+            });
         } catch (error) {
             console.error(error);
             await interaction.editReply({ content: "Ocurrió un error al intentar cambiar el banner." });
         }
-        
+
         console.log(` | Se ha utilizado el comando ${this.name}`);
     }
 };
