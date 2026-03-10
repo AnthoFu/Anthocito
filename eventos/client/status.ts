@@ -1,13 +1,20 @@
-const { ActivityType } = require("discord.js");
+import { ActivityType, Client } from "discord.js";
 
-module.exports = {
+interface Status {
+    name: string;
+    type: ActivityType;
+    status: "online" | "idle" | "dnd" | "invisible";
+    url?: string;
+}
+
+export default {
     name: "ready",
     once: true,
 
-    async execute(client) {
+    async execute(client: Client) {
         console.log(" | Estado del bot cargado con exito. :3 Se puede modificar el archivo en status.js");
 
-        const statusarray = [
+        const statusarray: Status[] = [
             {
                 name: "con la estabilidad mental de Antho",
                 type: ActivityType.Playing,
@@ -18,7 +25,6 @@ module.exports = {
                 type: ActivityType.Watching,
                 status: "online"
             },
-
             {
                 name: "hacer sufrir a Antho.",
                 type: ActivityType.Competing,
@@ -29,7 +35,7 @@ module.exports = {
         setInterval(() => {
             const option = Math.floor(Math.random() * statusarray.length);
 
-            client.user.setPresence({
+            client.user?.setPresence({
                 activities: [
                     {
                         name: statusarray[option].name,

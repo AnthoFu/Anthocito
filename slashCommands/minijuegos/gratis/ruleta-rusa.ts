@@ -1,11 +1,37 @@
 /* eslint-disable no-param-reassign */
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+import {
+    EmbedBuilder,
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    Client,
+    ChatInputCommandInteraction,
+    User,
+    Message,
+    ButtonInteraction,
+    InteractionCollector,
+    Collection,
+    TextChannel,
+    ComponentType
+} from "discord.js";
+
 //! Este código todavía esta en desarrollo
 
-// Usaremos un Map para almacenar el estado de los juegos activos en cada canal.
-const activeGames = new Map();
+interface Game {
+    hostId: string;
+    players: User[];
+    interaction: ChatInputCommandInteraction;
+    message: Message;
+    collector: InteractionCollector<ButtonInteraction> | null;
+    currentPlayerIndex: number;
+    chamberPosition: number;
+    bulletPosition: number;
+}
 
-async function nextTurn(game) {
+// Usaremos un Map para almacenar el estado de los juegos activos en cada canal.
+const activeGames = new Map<string, Game>();
+
+async function nextTurn(game: Game) {
     if (game.players.length === 1) {
         const winner = game.players[0];
         const endEmbed = new EmbedBuilder()
@@ -14,7 +40,7 @@ async function nextTurn(game) {
             .setColor("#2ECC71");
 
         await game.message.edit({ embeds: [endEmbed], components: [] });
-        activeGames.delete(game.interaction.channel.id);
+        activeGames.delete(game.interaction.channel!.id);
         return;
     }
 
@@ -29,16 +55,21 @@ async function nextTurn(game) {
         )
         .addFields({ name: "Jugadores restantes", value: playerList });
 
-    const turnButton = new ActionRowBuilder().addComponents(
+    const turnButton = new ActionRowBuilder<ButtonBuilder>().addComponents(
         new ButtonBuilder().setCustomId("pull_trigger").setLabel("Jalar el gatillo").setStyle(ButtonStyle.Danger)
     );
 
     await game.message.edit({ embeds: [turnEmbed], components: [turnButton] });
 
-    const filter = (i) => i.customId === "pull_trigger" && i.user.id === currentPlayer.id;
-    const collector = game.message.createMessageComponentCollector({ filter, max: 1, time: 60000 });
+    const filter = (i: ButtonInteraction) => i.customId === "pull_trigger" && i.user.id === currentPlayer.id;
+    const collector = game.message.createMessageComponentCollector({
+        componentType: ComponentType.Button,
+        filter,
+        max: 1,
+        time: 60000
+    });
 
-    collector.on("collect", async (i) => {
+    collector.on("collect", async (i: ButtonInteraction) => {
         await i.deferUpdate();
 
         const resultEmbed = new EmbedBuilder().setTitle("🔫 Ruleta Rusa");
@@ -69,13 +100,13 @@ async function nextTurn(game) {
             game.currentPlayerIndex = 0;
         }
 
-        await game.message.channel.send({ embeds: [resultEmbed] });
+        await (game.message.channel as TextChannel).send({ embeds: [resultEmbed] });
 
         // Pausa dramática antes del siguiente turno
         setTimeout(() => nextTurn(game), 3000);
     });
 
-    collector.on("end", (collected, reason) => {
+    collector.on("end", (collected: Collection<string, ButtonInteraction>, reason: string) => {
         if (reason === "time") {
             const eliminatedPlayer = game.players.splice(game.currentPlayerIndex, 1)[0];
             const timeoutEmbed = new EmbedBuilder()
@@ -83,7 +114,7 @@ async function nextTurn(game) {
                 .setColor("#E74C3C")
                 .setDescription(`**${eliminatedPlayer.username}** no actuó a tiempo y ha sido eliminado por cobarde.`);
 
-            game.message.channel.send({ embeds: [timeoutEmbed] });
+            (game.message.channel as TextChannel).send({ embeds: [timeoutEmbed] });
 
             // Asegurarse de que el índice no se salga de los límites
             if (game.currentPlayerIndex >= game.players.length) {
@@ -95,7 +126,7 @@ async function nextTurn(game) {
     });
 }
 
-async function startGame(game) {
+async function startGame(game: Game) {
     const { interaction, players } = game;
 
     const playerArray = Array.from(players.values());
@@ -116,13 +147,13 @@ async function startGame(game) {
     nextTurn(game);
 }
 
-module.exports = {
+export default {
     name: "ruletarusa",
     description: "Inicia un juego de ruleta rusa al que otros pueden unirse.",
 
-    async execute(client, interaction) {
+    async execute(client: Client, interaction: ChatInputCommandInteraction) {
         // Comprobar si ya hay un juego en este canal
-        if (activeGames.has(interaction.channel.id)) {
+        if (activeGames.has(interaction.channel!.id)) {
             await interaction.reply({
                 content: "Ya hay un juego de Ruleta Rusa en curso en este canal.",
                 ephemeral: true
@@ -131,7 +162,7 @@ module.exports = {
         }
 
         const host = interaction.user;
-        const players = new Map(); // Usaremos un Map para evitar duplicados fácilmente
+        const players = new Map<string, User>(); // Usaremos un Map para evitar duplicados fácilmente
         players.set(host.id, host);
 
         const embed = new EmbedBuilder()
@@ -142,7 +173,7 @@ module.exports = {
             )
             .addFields({ name: "Jugadores (1)", value: host.username });
 
-        const buttons = new ActionRowBuilder().addComponents(
+        const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
             new ButtonBuilder().setCustomId("join_rr").setLabel("Unirse").setStyle(ButtonStyle.Primary),
             new ButtonBuilder().setCustomId("start_rr").setLabel("Comenzar Partida").setStyle(ButtonStyle.Success),
             new ButtonBuilder().setCustomId("cancel_rr").setLabel("Cancelar").setStyle(ButtonStyle.Danger)
@@ -150,19 +181,25 @@ module.exports = {
 
         const message = await interaction.reply({ embeds: [embed], components: [buttons], fetchReply: true });
 
-        const game = {
+        const game: Game = {
             hostId: host.id,
-            players,
+            players: Array.from(players.values()),
             interaction,
             message,
-            collector: null
+            collector: null,
+            currentPlayerIndex: 0,
+            chamberPosition: 0,
+            bulletPosition: 0
         };
-        activeGames.set(interaction.channel.id, game);
+        activeGames.set(interaction.channel!.id, game);
 
-        const collector = message.createMessageComponentCollector({ time: 300000 }); // 5 minutos para iniciar
+        const collector = message.createMessageComponentCollector({
+            componentType: ComponentType.Button,
+            time: 300000
+        }); // 5 minutos para iniciar
         game.collector = collector;
 
-        collector.on("collect", async (i) => {
+        collector.on("collect", async (i: ButtonInteraction) => {
             // Solo el anfitrión puede iniciar o cancelar
             if (i.customId === "start_rr" || i.customId === "cancel_rr") {
                 if (i.user.id !== host.id) {
@@ -203,19 +240,19 @@ module.exports = {
                     .setColor("#581845")
                     .setFields([]);
                 await i.update({ embeds: [embed], components: [] });
-                activeGames.delete(interaction.channel.id);
+                activeGames.delete(interaction.channel!.id);
             }
             // Si ninguno de los customIds anteriores coincide, todavía necesitamos un retorno para consistent-return
         });
 
-        collector.on("end", (collected, reason) => {
+        collector.on("end", (collected: Collection<string, ButtonInteraction>, reason: string) => {
             if (reason === "time") {
                 embed
                     .setDescription("La partida no comenzó a tiempo y fue cancelada.")
                     .setColor("#581845")
                     .setFields([]);
                 interaction.editReply({ embeds: [embed], components: [] });
-                activeGames.delete(interaction.channel.id);
+                activeGames.delete(interaction.channel!.id);
             }
         });
     }

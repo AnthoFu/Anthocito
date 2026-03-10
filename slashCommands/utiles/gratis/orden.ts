@@ -1,7 +1,14 @@
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder } = require("discord.js");
-const OrderSchema = require("../../../models/OrderSchema");
+import {
+    SlashCommandBuilder,
+    EmbedBuilder,
+    ActionRowBuilder,
+    StringSelectMenuBuilder,
+    Client,
+    ChatInputCommandInteraction
+} from "discord.js";
+import OrderSchema, { IOrder } from "../../../models/OrderSchema";
 
-module.exports = {
+export default {
     data: new SlashCommandBuilder()
         .setName("orden")
         .setDescription("Gestiona tus órdenes de cashback.")
@@ -40,17 +47,17 @@ module.exports = {
                 )
         ),
 
-    async execute(client, interaction) {
+    async execute(client: Client, interaction: ChatInputCommandInteraction) {
         const subcommand = interaction.options.getSubcommand();
 
         if (subcommand === "nueva") {
-            const fecha = interaction.options.getString("fecha");
-            const cantidad = interaction.options.getInteger("cantidad");
-            const valor = interaction.options.getNumber("valor");
+            const fecha = interaction.options.getString("fecha")!;
+            const cantidad = interaction.options.getInteger("cantidad")!;
+            const valor = interaction.options.getNumber("valor")!;
             const colaboradorRaw = interaction.options.getString("colaborador");
 
-            let collaboratorId = null;
-            let collaboratorName = null;
+            let collaboratorId: string | null = null;
+            let collaboratorName: string | null = null;
 
             if (colaboradorRaw) {
                 const mentionMatch = colaboradorRaw.match(/<@!?(\d+)>/);
@@ -66,14 +73,15 @@ module.exports = {
                     try {
                         const colabUser = await client.users.fetch(collaboratorId);
                         collaboratorName = colabUser.tag;
-                    } catch (e) {
+                    } catch (_e: unknown) {
+                        console.error(`Error fetching collaborator user for ID ${collaboratorId}:`, _e);
                         collaboratorName = `ID: ${collaboratorId}`;
                     }
                 }
             }
 
-            const newOrder = new OrderSchema({
-                guildId: interaction.guild.id,
+            const newOrder: IOrder = new OrderSchema({
+                guildId: interaction.guild!.id,
                 userId: interaction.user.id,
                 userName: interaction.user.tag,
                 orderDate: fecha,
@@ -90,7 +98,7 @@ module.exports = {
                 .setTitle("✅ Orden Registrada")
                 .setDescription(`<@${interaction.user.id}> ha registrado una nueva orden. Pendiente de aprobación.`)
                 .addFields(
-                    { name: "ID de la Orden", value: `\`${newOrder.id}\``, inline: true },
+                    { name: "ID de la Orden", value: `\`${newOrder._id}\``, inline: true },
                     { name: "Fecha", value: fecha, inline: true },
                     { name: "Items", value: cantidad.toString(), inline: true },
                     { name: "Valor Total", value: `$${valor}`, inline: true }
@@ -106,7 +114,10 @@ module.exports = {
         }
 
         if (subcommand === "mis-ordenes") {
-            const orders = await OrderSchema.find({ userId: interaction.user.id, guildId: interaction.guild.id })
+            const orders: IOrder[] = await OrderSchema.find({
+                userId: interaction.user.id,
+                guildId: interaction.guild!.id
+            })
                 .sort({ createdAt: -1 })
                 .limit(5);
 
@@ -120,7 +131,7 @@ module.exports = {
                 .setTimestamp();
 
             orders.forEach((order) => {
-                const statusEmoji = {
+                const statusEmoji: { [key: string]: string } = {
                     pendiente: "⏳",
                     aprobada: "✅",
                     pagada: "💰",
@@ -129,8 +140,14 @@ module.exports = {
                 };
 
                 embed.addFields({
-                    name: `Orden #${order.id.toString().slice(-6)} - ${statusEmoji[order.status]} ${order.status.toUpperCase()}`,
-                    value: `**Fecha:** ${order.orderDate}\n**Items:** ${order.quantity}\n**Valor:** $${order.totalValue}\n**Neto:** ${order.status === "pendiente" ? "Por calcular" : `$${order.netPayout}`}\n**ID:** \`${order.id}\``
+                    name: `Orden #${order._id.toString().slice(-6)} - ${
+                        statusEmoji[order.status]
+                    } ${order.status.toUpperCase()}`,
+                    value: `**Fecha:** ${order.orderDate}\n**Items:** ${order.quantity}\n**Valor:** $${
+                        order.totalValue
+                    }\n**Neto:** ${
+                        order.status === "pendiente" ? "Por calcular" : `$${order.netPayout}`
+                    }\n**ID:** \`${order._id}\``
                 });
             });
 
@@ -138,7 +155,7 @@ module.exports = {
         }
 
         if (subcommand === "vouch") {
-            const ordersToVouch = await OrderSchema.find({
+            const ordersToVouch: IOrder[] = await OrderSchema.find({
                 userId: interaction.user.id,
                 status: "pagada"
             });
@@ -151,9 +168,9 @@ module.exports = {
             }
 
             const options = ordersToVouch.map((order) => ({
-                label: `Orden #${order.id.toString().slice(-6)}`,
+                label: `Orden #${order._id.toString().slice(-6)}`,
                 description: `Valor: $${order.totalValue}, Pagado: $${order.netPayout.toFixed(2)}`,
-                value: `vouch_${order.id}`
+                value: `vouch_${order._id}`
             }));
 
             const selectMenu = new StringSelectMenuBuilder()
@@ -161,7 +178,7 @@ module.exports = {
                 .setPlaceholder("Selecciona una orden para hacer el vouch")
                 .addOptions(options);
 
-            const row = new ActionRowBuilder().addComponents(selectMenu);
+            const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu);
 
             return interaction.reply({
                 content: "Tienes las siguientes órdenes listas para hacer vouch. Por favor, selecciona una:",

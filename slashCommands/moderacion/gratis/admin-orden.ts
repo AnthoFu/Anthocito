@@ -1,13 +1,15 @@
-const {
+import {
     SlashCommandBuilder,
     EmbedBuilder,
     PermissionFlagsBits,
     ActionRowBuilder,
-    StringSelectMenuBuilder
-} = require("discord.js");
-const OrderSchema = require("../../../models/OrderSchema");
+    StringSelectMenuBuilder,
+    Client,
+    ChatInputCommandInteraction
+} from "discord.js";
+import OrderSchema, { IOrder } from "../../../models/OrderSchema";
 
-module.exports = {
+export default {
     data: new SlashCommandBuilder()
         .setName("admin-orden")
         .setDescription("Gestiona las órdenes de cashback de los usuarios.")
@@ -19,11 +21,14 @@ module.exports = {
             subcommand.setName("panel-pagos").setDescription("Muestra el panel para pagar órdenes aprobadas.")
         ),
 
-    async execute(client, interaction) {
+    async execute(client: Client, interaction: ChatInputCommandInteraction) {
         const subcommand = interaction.options.getSubcommand();
 
         if (subcommand === "panel") {
-            const orders = await OrderSchema.find({ guildId: interaction.guild.id, status: "pendiente" }).limit(25);
+            const orders: IOrder[] = await OrderSchema.find({
+                guildId: interaction.guild!.id,
+                status: "pendiente"
+            }).limit(25);
 
             if (orders.length === 0) {
                 return interaction.reply({ content: "No hay órdenes pendientes por ahora. ✨", ephemeral: true });
@@ -41,24 +46,29 @@ module.exports = {
 
             orders.forEach((order) => {
                 embed.addFields({
-                    name: `📦 Orden #${order.id.toString().slice(-6)}`,
-                    value: `**Usuario:** ${order.userName}\n**Monto:** $${order.totalValue} | **Items:** ${order.quantity}`
+                    name: `📦 Orden #${order._id.toString().slice(-6)}`,
+                    value: `**Usuario:** ${order.userName}\n**Monto:** $${order.totalValue} | **Items:** ${
+                        order.quantity
+                    }`
                 });
 
                 selectMenu.addOptions({
-                    label: `Orden #${order.id.toString().slice(-6)} - ${order.userName}`,
+                    label: `Orden #${order._id.toString().slice(-6)} - ${order.userName}`,
                     description: `Valor: $${order.totalValue} | Items: ${order.quantity}`,
-                    value: order.id.toString()
+                    value: order._id.toString()
                 });
             });
 
-            const row = new ActionRowBuilder().addComponents(selectMenu);
+            const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu);
 
             return interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
         }
 
         if (subcommand === "panel-pagos") {
-            const orders = await OrderSchema.find({ guildId: interaction.guild.id, status: "aprobada" }).limit(25);
+            const orders: IOrder[] = await OrderSchema.find({
+                guildId: interaction.guild!.id,
+                status: "aprobada"
+            }).limit(25);
 
             if (orders.length === 0) {
                 return interaction.reply({
@@ -79,18 +89,18 @@ module.exports = {
 
             orders.forEach((order) => {
                 embed.addFields({
-                    name: `✅ Orden #${order.id.toString().slice(-6)}`,
+                    name: `✅ Orden #${order._id.toString().slice(-6)}`,
                     value: `**Usuario:** ${order.userName}\n**Neto a Pagar:** $${order.netPayout.toFixed(2)}`
                 });
 
                 selectMenu.addOptions({
-                    label: `Orden #${order.id.toString().slice(-6)} - ${order.userName}`,
+                    label: `Orden #${order._id.toString().slice(-6)} - ${order.userName}`,
                     description: `Neto a Pagar: $${order.netPayout.toFixed(2)}`,
-                    value: order.id.toString()
+                    value: order._id.toString()
                 });
             });
 
-            const row = new ActionRowBuilder().addComponents(selectMenu);
+            const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu);
 
             return interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
         }

@@ -1,13 +1,13 @@
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-const fs = require("fs");
-const path = require("path");
+import { SlashCommandBuilder, EmbedBuilder, Client, ChatInputCommandInteraction } from "discord.js";
+import fs from "fs";
+import path from "path";
 
-module.exports = {
+export default {
     data: new SlashCommandBuilder()
         .setName("help")
         .setDescription("Muestra todos los comandos disponibles en un embed."),
 
-    async execute(client, interaction) {
+    async execute(client: Client, interaction: ChatInputCommandInteraction) {
         try {
             const embed = new EmbedBuilder()
                 .setTitle("📜 Menú de Ayuda")
@@ -19,7 +19,7 @@ module.exports = {
             for (const folder of commandFolders) {
                 const gratisFolder = path.join(__dirname, "..", "..", folder, "gratis");
                 if (fs.existsSync(gratisFolder) && fs.lstatSync(gratisFolder).isDirectory()) {
-                    const commandFiles = fs.readdirSync(gratisFolder).filter((file) => file.endsWith(".js"));
+                    const commandFiles = fs.readdirSync(gratisFolder).filter((file) => file.endsWith(".ts"));
 
                     if (commandFiles.length > 0) {
                         const commandList = commandFiles.map((file) => `\`/${path.parse(file).name}\``).join(", ");

@@ -1,6 +1,7 @@
-const fetch = require("node-fetch");
+import { ApplicationCommandOptionType, Client, ChatInputCommandInteraction } from "discord.js";
+import fetch from "node-fetch";
 
-module.exports = {
+export default {
     name: "setbanner",
     description: "Cambiar el banner del perfil del bot, solo el Antho puede hacerlo",
     options: [
@@ -8,33 +9,33 @@ module.exports = {
             name: "banner",
             description: "Selecciona el banner",
             required: true,
-            type: 11
+            type: ApplicationCommandOptionType.Attachment
         }
     ],
 
-    async execute(client, interaction) {
+    async execute(client: Client, interaction: ChatInputCommandInteraction) {
         // Verificar si el ID del usuario coincide con el SUPER_ADMIN_ID en el .env
         if (interaction.user.id !== process.env.SUPER_ADMIN_ID) {
             await interaction.reply({ content: "No tienes permiso para usar este comando.", ephemeral: true });
             return;
         }
 
-        const banner = interaction.options.getAttachment("banner");
+        const banner = interaction.options.getAttachment("banner")!;
 
         // Responder de manera diferida para evitar el error de "Unknown interaction" (timeout de 3 segundos)
         await interaction.deferReply();
 
         try {
             const response = await fetch(banner.url);
-            const buffer = await response.buffer();
-            const base64 = buffer.toString("base64");
+            const buffer = await response.arrayBuffer();
+            const base64 = Buffer.from(buffer).toString("base64");
             const imageData = `data:${banner.contentType};base64,${base64}`;
 
             await fetch("https://discord.com/api/v10/users/@me", {
                 method: "PATCH",
                 headers: {
                     Authorization: `Bot ${client.token}`,
-                    "Content-Type": "application/json,"
+                    "Content-Type": "application/json"
                 },
                 body: JSON.stringify({ banner: imageData })
             });

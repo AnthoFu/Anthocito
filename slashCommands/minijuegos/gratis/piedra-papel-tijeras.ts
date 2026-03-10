@@ -1,13 +1,22 @@
 /* eslint-disable max-len */
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+import {
+    EmbedBuilder,
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    Client,
+    ChatInputCommandInteraction,
+    ComponentType,
+    ButtonInteraction
+} from "discord.js";
 
-module.exports = {
+export default {
     name: "piedra-papel-tijeras", // Nombre del comando
     description: "Prueba tu suerte jugando el clásico piedra, papel o tijeras",
 
     // Descripción
 
-    async execute(client, interaction) {
+    async execute(client: Client, interaction: ChatInputCommandInteraction) {
         // Crear un Embed para las instrucciones del juego
         const embed = new EmbedBuilder()
             .setColor(0x00ae86)
@@ -15,7 +24,7 @@ module.exports = {
             .setDescription("¡Selecciona tu opción!");
 
         // Crear los botones con los emojis 🪨, 📄, ✂️
-        const row = new ActionRowBuilder().addComponents(
+        const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
             new ButtonBuilder().setCustomId("piedra").setLabel("🪨").setStyle(ButtonStyle.Primary),
             new ButtonBuilder().setCustomId("papel").setLabel("📄").setStyle(ButtonStyle.Primary),
             new ButtonBuilder().setCustomId("tijeras").setLabel("✂️").setStyle(ButtonStyle.Primary)
@@ -29,9 +38,13 @@ module.exports = {
 
         // Esperar la interacción del usuario con un límite de tiempo de 10 segundos
         try {
-            const filter = (i) => i.user.id === interaction.user.id;
+            const filter = (i: ButtonInteraction) => i.user.id === interaction.user.id;
             // Filtrar para que solo el usuario que ejecutó el comando pueda responder
-            const userChoice = await interaction.channel.awaitMessageComponent({ filter, time: 10000 });
+            const userChoice = await interaction.channel!.awaitMessageComponent({
+                filter,
+                componentType: ComponentType.Button,
+                time: 10000
+            });
 
             // Elección aleatoria del bot
             const botChoice = opcionesBot[Math.floor(Math.random() * opcionesBot.length)];
@@ -54,7 +67,8 @@ module.exports = {
             } else {
                 await interaction.followUp("¡Perdiste! Muejejeje >:3");
             }
-        } catch (error) {
+        } catch (_error: unknown) {
+            console.error("Error en piedra-papel-tijeras:", _error);
             // Si se agota el tiempo sin que el usuario elija
             await interaction.editReply({
                 content: "Eh... ¿Hola? ¿Sigues ahí? Se te acabo el tiempo... ¡Tontito!",

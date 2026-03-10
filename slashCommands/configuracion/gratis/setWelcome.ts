@@ -1,7 +1,14 @@
-const { SlashCommandBuilder, PermissionFlagsBits, ChannelType, EmbedBuilder } = require("discord.js");
-const WelcomeSchema = require("../../../models/WelcomeSchema");
+import {
+    SlashCommandBuilder,
+    PermissionFlagsBits,
+    ChannelType,
+    EmbedBuilder,
+    Client,
+    ChatInputCommandInteraction
+} from "discord.js";
+import WelcomeSchema, { IWelcome } from "../../../models/WelcomeSchema";
 
-module.exports = {
+export default {
     data: new SlashCommandBuilder()
         .setName("setwelcome")
         .setDescription("Configura el sistema de bienvenidas del servidor.")
@@ -23,19 +30,19 @@ module.exports = {
                 .setRequired(false)
         ),
 
-    async execute(client, interaction) {
+    async execute(client: Client, interaction: ChatInputCommandInteraction) {
         const { guild } = interaction;
 
         // Usamos directamente interaction.options para evitar errores de tipo
-        const estado = interaction.options.getBoolean("estado");
+        const estado = interaction.options.getBoolean("estado")!;
         const canal = interaction.options.getChannel("canal");
         const mensaje = interaction.options.getString("mensaje");
 
         // Buscar o crear la configuración en la base de datos
-        let welcomeData = await WelcomeSchema.findOne({ guildId: guild.id });
+        let welcomeData: IWelcome | null = await WelcomeSchema.findOne({ guildId: guild!.id });
 
         if (!welcomeData) {
-            welcomeData = new WelcomeSchema({ guildId: guild.id });
+            welcomeData = new WelcomeSchema({ guildId: guild!.id });
         }
 
         // Actualizar datos
@@ -48,7 +55,7 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setTitle("⚙️ Configuración de Bienvenidas")
             .setColor("Green")
-            .setDescription(`Se ha actualizado la configuración de las bienvenidas en **${guild.name}**.`)
+            .setDescription(`Se ha actualizado la configuración de las bienvenidas en **${guild!.name}**.`)
             .addFields(
                 { name: "Estado", value: estado ? "✅ Activado" : "❌ Desactivado", inline: true },
                 {

@@ -1,30 +1,32 @@
-module.exports = {
+import { ApplicationCommandOptionType, Client, ChatInputCommandInteraction } from "discord.js";
+
+export default {
     name: "setimagen",
     description: "Poner una imagen animada al bot",
     options: [
         {
             name: "imagen",
             description: "Selecciona la imagen",
-            type: 11, // Tipo de adjunto
+            type: ApplicationCommandOptionType.Attachment, // Tipo de adjunto
             required: true
         }
     ],
 
-    async execute(client, interaction) {
+    async execute(client: Client, interaction: ChatInputCommandInteraction) {
         // Verificar si el ID del usuario coincide con el SUPER_ADMIN_ID en el .env
         if (interaction.user.id !== process.env.SUPER_ADMIN_ID) {
             await interaction.reply({ content: "No tienes permiso para usar este comando.", ephemeral: true });
             return;
         }
 
-        const avatar = interaction.options.getAttachment("imagen");
+        const avatar = interaction.options.getAttachment("imagen")!;
 
         // Responder de manera diferida mientras se cambia el avatar
         await interaction.deferReply();
 
         try {
             // Cambiar el avatar del bot
-            await client.user.setAvatar(avatar.url);
+            await client.user!.setAvatar(avatar.url);
 
             // Enviar la respuesta una vez que el avatar ha sido cambiado
             await interaction.editReply({

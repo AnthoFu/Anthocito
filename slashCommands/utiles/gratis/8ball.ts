@@ -1,19 +1,19 @@
-const { EmbedBuilder } = require("discord.js");
+import { ApplicationCommandOptionType, Client, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 
-module.exports = {
+export default {
     name: "8ball",
     description: "Deja que anthocito responda tu pregunta. owo",
     options: [
         {
             name: "pregunta",
             description: "Hazle una pregunta a Anthocito",
-            type: 3, // Tipo 3 es STRING
+            type: ApplicationCommandOptionType.String,
             required: true
         }
     ],
 
-    async execute(client, interaction) {
-        const pgr = interaction.options.getString("pregunta");
+    async execute(client: Client, interaction: ChatInputCommandInteraction) {
+        const pgr = interaction.options.getString("pregunta")!;
 
         const respuestas = [
             "¡Sí!",
@@ -34,7 +34,7 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setColor("#FFFFFF")
             .setDescription(
-                `|Pregunta para: ${client.user.username}\n\n**Pregunta:** ${pgr} \n\n**Respuesta:** ${botRespuesta}`
+                `|Pregunta para: ${client.user!.username}\n\n**Pregunta:** ${pgr} \n\n**Respuesta:** ${botRespuesta}`
             );
 
         await interaction.reply({ embeds: [embed] });

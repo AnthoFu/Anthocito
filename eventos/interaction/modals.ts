@@ -1,10 +1,10 @@
-const { EmbedBuilder } = require("discord.js");
-const OrderSchema = require("../../models/OrderSchema");
+import { EmbedBuilder, Interaction, Client } from "discord.js";
+import OrderSchema, { IOrder } from "../../models/OrderSchema";
 
-module.exports = {
+export default {
     name: "interactionCreate",
 
-    async execute(interaction, client) {
+    async execute(interaction: Interaction, client: Client) {
         if (!interaction.isModalSubmit()) return;
 
         if (interaction.customId === "modal_nueva_orden") {
@@ -21,8 +21,8 @@ module.exports = {
                 return;
             }
 
-            let collaboratorId = null;
-            let collaboratorName = null;
+            let collaboratorId: string | null = null;
+            let collaboratorName: string | null = null;
 
             if (colaboradorRaw) {
                 // Intentar extraer ID de una mención <@!123> o <@123>
@@ -40,14 +40,15 @@ module.exports = {
                     try {
                         const colabUser = await client.users.fetch(collaboratorId);
                         collaboratorName = colabUser.tag;
-                    } catch (e) {
+                    } catch (_e: unknown) {
+                        console.error(`Error fetching collaborator user for ID ${collaboratorId}:`, _e);
                         collaboratorName = `ID: ${collaboratorId}`;
                     }
                 }
             }
 
-            const newOrder = new OrderSchema({
-                guildId: interaction.guild.id,
+            const newOrder: IOrder = new OrderSchema({
+                guildId: interaction.guild!.id,
                 userId: interaction.user.id,
                 userName: interaction.user.tag,
                 orderDate: fecha,
@@ -64,7 +65,7 @@ module.exports = {
                 .setTitle("✅ Orden Registrada")
                 .setDescription("Tu orden ha sido registrada correctamente y está a la espera de aprobación.")
                 .addFields(
-                    { name: "ID de la Orden", value: `\`${newOrder.id}\``, inline: true },
+                    { name: "ID de la Orden", value: `\`${newOrder._id}\``, inline: true },
                     { name: "Fecha", value: fecha, inline: true },
                     { name: "Items", value: cantidad.toString(), inline: true },
                     { name: "Valor Total", value: `$${valor}`, inline: true }
@@ -110,8 +111,8 @@ module.exports = {
                 await user.send({
                     content: `❌ Tu orden de cashback ha sido **rechazada**.\n**Motivo:** ${reason}`
                 });
-            } catch (err) {
-                console.log(`No se pudo enviar MD al usuario ${order.userId}`);
+            } catch (_err) {
+                console.error(`No se pudo enviar MD al usuario ${order.userId}:`, _err);
             }
         }
         if (interaction.customId.startsWith("vouch_modal_")) {
@@ -147,7 +148,7 @@ module.exports = {
                 .addFields(
                     { name: "👤 Usuario", value: `<@${order.userId}>`, inline: true },
                     { name: "💰 Monto Recibido", value: `$${order.netPayout.toFixed(2)}`, inline: true },
-                    { name: "📝 Orden ID", value: `\`${order.id}\``, inline: true }
+                    { name: "📝 Orden ID", value: `\`${order._id}\``, inline: true }
                 )
                 .setTimestamp()
                 .setThumbnail(interaction.user.displayAvatarURL())
