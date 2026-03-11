@@ -6,12 +6,13 @@ import { config } from "dotenv";
 import { loadSlash } from "./handlers/slashHandler";
 import { loadEvents } from "./handlers/eventHandler";
 import { loadDatabase } from "./handlers/databaseHandler";
+import { SlashCommand } from "./interfaces/Command";
 
 config(); // Libreria requerida para poder guardar el token del bot en un archivo oculto (.env)
 
 // Eventos y constantes necesarias para funcionar
 export class CustomClient extends Client {
-    slashCommands: Collection<string, unknown> = new Collection();
+    slashCommands: Collection<string, SlashCommand> = new Collection();
 }
 
 const client = new CustomClient({ intents: 3276799 });

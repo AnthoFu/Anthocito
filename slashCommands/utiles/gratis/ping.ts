@@ -1,10 +1,12 @@
-import { Client, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
+import { ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
+import { SlashCommand } from "../../../interfaces/Command";
+import { CustomClient } from "../../../index";
 
-export default {
+const command: SlashCommand = {
     name: "ping",
     description: "Comando para saber la latencia con el bot",
 
-    async execute(client: Client, interaction: ChatInputCommandInteraction) {
+    async execute(client: CustomClient, interaction: ChatInputCommandInteraction) {
         const ping = Date.now() - interaction.createdTimestamp;
 
         const embed = new EmbedBuilder().setColor("Purple").setDescription(`Ping => ${ping}`);
@@ -12,3 +14,5 @@ export default {
         interaction.reply({ embeds: [embed] });
     }
 };
+
+export default command;
