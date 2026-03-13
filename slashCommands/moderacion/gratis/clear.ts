@@ -1,11 +1,21 @@
-module.exports = {
+import {
+    ApplicationCommandOptionType,
+    ChannelType,
+    Client,
+    ChatInputCommandInteraction,
+    GuildMember,
+    Message,
+    TextChannel
+} from "discord.js";
+
+export default {
     name: "clear",
     description: "Borrar la cantidad de mensajes que coloques",
     options: [
         {
             name: "cantidad",
             description: "Cantidad de mensajes que desea borrar (maximo 100 mensajes).",
-            type: 10,
+            type: ApplicationCommandOptionType.Number,
             required: true,
             maxValue: 100,
             minValue: 1
@@ -13,33 +23,33 @@ module.exports = {
         {
             name: "usuario",
             description: "Menciona al usuario que deseas borrar sus mensajes",
-            type: 6,
+            type: ApplicationCommandOptionType.User,
             required: false
         },
         {
             name: "canal",
             description: "Menciona el canal",
-            type: 7,
-            channelTypes: [0],
+            type: ApplicationCommandOptionType.Channel,
+            channelTypes: [ChannelType.GuildText],
             required: false
         }
     ],
 
-    async execute(client, interaction) {
-        const cantidad = interaction.options.getNumber("cantidad");
+    async execute(client: Client, interaction: ChatInputCommandInteraction) {
+        const cantidad = interaction.options.getNumber("cantidad")!;
         const usuario = interaction.options.getUser("usuario");
-        const canal = interaction.options.getChannel("canal") || interaction.channel;
+        const canal = (interaction.options.getChannel("canal") || interaction.channel) as TextChannel;
 
-        if (!interaction.member.permissions.has("ManageMessages")) {
+        if (!(interaction.member as GuildMember).permissions.has("ManageMessages")) {
             await interaction.reply({
                 content: "No tienes los suficientes permisos para utilizar este comando, ¡Tonto!"
             });
             return;
         }
-        const mensajes = await interaction.channel.messages.fetch();
+        const mensajes = await interaction.channel!.messages.fetch();
 
         if (usuario) {
-            const filtered = [];
+            const filtered: Message[] = [];
             for (const m of mensajes.values()) {
                 // Iterar sobre la colección
                 if (m.author.id === usuario.id && filtered.length < cantidad) {

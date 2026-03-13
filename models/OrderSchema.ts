@@ -1,6 +1,26 @@
-const mongoose = require("mongoose");
+import { Schema, model, Document } from "mongoose";
 
-const OrderSchema = new mongoose.Schema({
+export interface IOrder extends Document {
+    guildId: string;
+    userId: string;
+    userName: string;
+    orderDate: string;
+    quantity: number;
+    totalValue: number;
+    collaboratorId?: string;
+    collaboratorName?: string;
+    collaboratorCommission?: number;
+    cashback?: number;
+    commission?: number;
+    netPayout: number;
+    status: "pendiente" | "aprobada" | "pagada" | "finalizada" | "rechazada";
+    createdAt: Date;
+    approvedAt?: Date;
+    paidAt?: Date;
+    rejectionReason?: string;
+}
+
+const OrderSchema = new Schema<IOrder>({
     guildId: { type: String, required: true },
     userId: { type: String, required: true },
     userName: { type: String, required: true },
@@ -24,4 +44,4 @@ const OrderSchema = new mongoose.Schema({
     rejectionReason: { type: String }
 });
 
-module.exports = mongoose.model("Order", OrderSchema);
+export default model<IOrder>("Order", OrderSchema);

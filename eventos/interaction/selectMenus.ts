@@ -1,18 +1,20 @@
-const {
+import {
     EmbedBuilder,
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
     ModalBuilder,
     TextInputBuilder,
-    TextInputStyle
-} = require("discord.js");
-const OrderSchema = require("../../models/OrderSchema");
+    TextInputStyle,
+    Interaction,
+    StringSelectMenuInteraction
+} from "discord.js";
+import OrderSchema from "../../models/OrderSchema";
 
-module.exports = {
+export default {
     name: "interactionCreate",
 
-    async execute(interaction) {
+    async execute(interaction: Interaction) {
         if (!interaction.isStringSelectMenu()) return;
 
         if (interaction.customId === "seleccionar_orden_gestionar") {
@@ -28,7 +30,7 @@ module.exports = {
                 .setTitle("🔎 Gestión de Orden")
                 .setDescription(`Detalles de la orden de **${order.userName}**`)
                 .addFields(
-                    { name: "ID", value: `\`${order.id}\``, inline: true },
+                    { name: "ID", value: `\`${order._id}\``, inline: true },
                     { name: "Fecha", value: order.orderDate, inline: true },
                     { name: "Items", value: order.quantity.toString(), inline: true },
                     { name: "Valor Total", value: `$${order.totalValue}`, inline: true }
@@ -39,17 +41,17 @@ module.exports = {
                 embed.addFields({ name: "Colaborador", value: `${order.collaboratorName}`, inline: false });
             }
 
-            const row = new ActionRowBuilder().addComponents(
+            const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
                 new ButtonBuilder()
-                    .setCustomId(`aprobar_40_${order.id}`)
+                    .setCustomId(`aprobar_40_${order._id}`)
                     .setLabel("Aprobar (40% - Com)")
                     .setStyle(ButtonStyle.Success),
                 new ButtonBuilder()
-                    .setCustomId(`aprobar_30_${order.id}`)
+                    .setCustomId(`aprobar_30_${order._id}`)
                     .setLabel("Aprobar (30% Flat)")
                     .setStyle(ButtonStyle.Primary),
                 new ButtonBuilder()
-                    .setCustomId(`rechazar_${order.id}`)
+                    .setCustomId(`rechazar_${order._id}`)
                     .setLabel("Rechazar")
                     .setStyle(ButtonStyle.Danger)
             );
@@ -68,10 +70,10 @@ module.exports = {
                 .setPlaceholder("¡Pago recibido correctamente! Gracias.")
                 .setRequired(false);
 
-            const firstActionRow = new ActionRowBuilder().addComponents(commentInput);
+            const firstActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(commentInput);
             modal.addComponents(firstActionRow);
 
-            await interaction.showModal(modal);
+            await (interaction as StringSelectMenuInteraction).showModal(modal);
         } else if (interaction.customId === "seleccionar_orden_pagar") {
             const orderId = interaction.values[0];
             const order = await OrderSchema.findById(orderId);
@@ -96,7 +98,7 @@ module.exports = {
 
             const embed = new EmbedBuilder()
                 .setTitle("💰 Pago Registrado")
-                .setDescription(`La orden \`${order.id}\` de **${order.userName}** ha sido marcada como **PAGADA**.`)
+                .setDescription(`La orden \`${order._id}\` de **${order.userName}** ha sido marcada como **PAGADA**.`)
                 .setColor("Green")
                 .addFields({ name: "Monto Neto Pagado", value: `$${order.netPayout.toFixed(2)}` });
 
@@ -109,7 +111,7 @@ module.exports = {
                     content: `💸 ¡Tu pago ha sido enviado!\n**Monto:** $${order.netPayout.toFixed(
                         2
                     )}\n**Orden ID:** \`${
-                        order.id
+                        order._id
                     }\`\n\nDeberías verlo reflejado en tu cuenta en las próximas 72 horas. Una vez que recibas el monto, por favor, confírmalo usando el comando \`/orden vouch\`. ¡Gracias por tu confianza!`
                 });
             } catch (err) {

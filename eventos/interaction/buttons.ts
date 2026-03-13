@@ -1,10 +1,19 @@
-const { EmbedBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } = require("discord.js");
-const OrderSchema = require("../../models/OrderSchema");
+import {
+    EmbedBuilder,
+    ModalBuilder,
+    TextInputBuilder,
+    TextInputStyle,
+    ActionRowBuilder,
+    Interaction,
+    Client,
+    ButtonInteraction
+} from "discord.js";
+import OrderSchema from "../../models/OrderSchema";
 
-module.exports = {
+export default {
     name: "interactionCreate",
 
-    async execute(interaction, client) {
+    async execute(interaction: Interaction, client: Client) {
         if (!interaction.isButton()) return;
 
         const [action, type, id] = interaction.customId.split("_");
@@ -24,10 +33,10 @@ module.exports = {
         }
 
         if (action === "aprobar") {
-            let cashback;
-            let commission;
-            let netPayout;
-            let collaboratorCommission = 0;
+            let cashback: number = 0;
+            let commission: number = 0;
+            let netPayout: number = 0;
+            let collaboratorCommission: number = 0;
 
             if (type === "40") {
                 cashback = order.totalValue * 0.4;
@@ -83,8 +92,8 @@ module.exports = {
                         2
                     )}\n\nPronto recibirás una notificación cuando tu pago sea procesado. ¡Gracias por tu paciencia!`
                 });
-            } catch (err) {
-                console.log(`No se pudo enviar MD al usuario ${order.userId}`);
+            } catch (_err) {
+                console.error(`No se pudo enviar MD al usuario ${order.userId}:`, _err);
             }
         }
 
@@ -98,9 +107,11 @@ module.exports = {
                 .setPlaceholder("Ej: La factura no es legible o los datos no coinciden.")
                 .setRequired(true);
 
-            modal.addComponents(new ActionRowBuilder().addComponents(reasonInput));
+            const row = new ActionRowBuilder<TextInputBuilder>().addComponents(reasonInput);
 
-            await interaction.showModal(modal);
+            modal.addComponents(row);
+
+            await (interaction as ButtonInteraction).showModal(modal);
         }
     }
 };

@@ -1,16 +1,16 @@
-const { Events, EmbedBuilder } = require("discord.js");
-const WelcomeSchema = require("../../models/WelcomeSchema");
+import { Events, EmbedBuilder, GuildMember, TextChannel } from "discord.js";
+import WelcomeSchema from "../../models/WelcomeSchema";
 
-module.exports = {
+export default {
     name: Events.GuildMemberAdd,
-    async execute(member) {
+    async execute(member: GuildMember) {
         // Buscar configuración en la base de datos
         const welcomeData = await WelcomeSchema.findOne({ guildId: member.guild.id });
 
         if (!welcomeData || !welcomeData.enabled || !welcomeData.channelId) return;
 
         // Obtener el canal
-        const channel = member.guild.channels.cache.get(welcomeData.channelId);
+        const channel = member.guild.channels.cache.get(welcomeData.channelId) as TextChannel;
         if (!channel) return;
 
         // Reemplazar marcador de posición {user}
@@ -20,10 +20,10 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setTitle("✨ ¡Nuevo Miembro!")
             .setDescription(welcomeMessage)
-            .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
+            .setThumbnail(member.user.displayAvatarURL())
             .setColor("Random")
             .setTimestamp()
-            .setFooter({ text: `Miembro #${member.guild.memberCount}`, iconURL: member.guild.iconURL() });
+            .setFooter({ text: `Miembro #${member.guild.memberCount}`, iconURL: member.guild.iconURL()! });
 
         // Enviar al canal
         channel

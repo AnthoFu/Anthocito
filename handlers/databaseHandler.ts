@@ -1,9 +1,9 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 /**
  * Función para cargar y conectar a la base de datos de MongoDB
  */
-async function loadDatabase() {
+export async function loadDatabase() {
     const mongoURI = process.env.MONGODB_URI;
 
     if (!mongoURI) {
@@ -11,11 +11,9 @@ async function loadDatabase() {
     }
 
     try {
-        await mongoose.connect(mongoURI);
+        await mongoose.connect(mongoURI!);
         console.log(" | [MongoDB] ¡Conexión exitosa a la base de datos! :D ");
     } catch (err) {
         console.error(` | [MongoDB] Error al conectar a la base de datos :( => ${err}`);
     }
 }
-
-module.exports = { loadDatabase };
