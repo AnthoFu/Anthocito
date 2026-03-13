@@ -100,6 +100,7 @@ Crea un archivo `.env` en la raíz del proyecto:
 ```env
 TOKEN=TU_TOKEN_DE_DISCORD_AQUI
 MONGODB_URI=TU_CONEXION_A_MONGODB
+SUPER_ADMIN_ID=TU_ID_DE_DISCORD_AQUI
 PORT=3000
 ```
 
