@@ -2,9 +2,10 @@ import { readdirSync } from "node:fs";
 import path from "node:path";
 import { ApplicationCommandDataResolvable } from "discord.js";
 import { CustomClient } from "../index";
+import { SlashCommand } from "../interfaces/Command";
 
 export async function loadSlash(client: CustomClient) {
-    const commandPromises: Promise<any>[] = [];
+    const commandPromises: Promise<{ default: SlashCommand }>[] = [];
     const commandObjects: ApplicationCommandDataResolvable[] = [];
 
     // Path to slashCommands relative to this file
@@ -16,8 +17,8 @@ export async function loadSlash(client: CustomClient) {
         const otherCategories = readdirSync(categoryPath);
         for (const otherCategory of otherCategories) {
             const otherCategoryPath = path.join(categoryPath, otherCategory);
-            const commandFiles = readdirSync(otherCategoryPath).filter((file) =>
-                file.endsWith(".ts") || file.endsWith(".js")
+            const commandFiles = readdirSync(otherCategoryPath).filter(
+                (file) => file.endsWith(".ts") || file.endsWith(".js")
             );
             for (const fileName of commandFiles) {
                 // Remove extension for the import to let Node/TS resolve it
