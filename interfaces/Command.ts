@@ -1,8 +1,4 @@
-import { 
-    ChatInputCommandInteraction, 
-    ApplicationCommandData, 
-    ApplicationCommandDataResolvable 
-} from "discord.js";
+import { ChatInputCommandInteraction, ApplicationCommandData, ApplicationCommandDataResolvable } from "discord.js";
 import { CustomClient } from "../index";
 
 /**
@@ -10,15 +6,21 @@ import { CustomClient } from "../index";
  */
 export interface SlashCommand {
     /**
+     * Define si el comando está habilitado o no.
+     * Si es falso, no se registrará en Discord.
+     */
+    enabled?: boolean;
+
+    /**
      * Nombre del comando (opcional si se usa 'data')
      */
     name?: string;
-    
+
     /**
      * Descripción del comando (opcional si se usa 'data')
      */
     description?: string;
-    
+
     /**
      * Datos del comando para registrar en la API de Discord
      */
@@ -28,11 +30,6 @@ export interface SlashCommand {
      * Función que se ejecuta al llamar al comando
      * @param client Instancia personalizada del cliente
      * @param interaction La interacción de Discord
-     * @param args Argumentos procesados (opcional)
      */
-    execute: (
-        client: CustomClient, 
-        interaction: ChatInputCommandInteraction, 
-        args: (string | number | boolean)[]
-    ) => Promise<void> | void;
+    execute: (client: CustomClient, interaction: ChatInputCommandInteraction) => Promise<void> | void;
 }

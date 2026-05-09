@@ -2,9 +2,10 @@ import { readdirSync } from "node:fs";
 import path from "node:path";
 import { ApplicationCommandDataResolvable } from "discord.js";
 import { CustomClient } from "../index";
+import { SlashCommand } from "../interfaces/Command";
 
 export async function loadSlash(client: CustomClient) {
-    const commandPromises: Promise<any>[] = [];
+    const commandPromises: Promise<{ default: SlashCommand }>[] = [];
     const commandObjects: ApplicationCommandDataResolvable[] = [];
 
     // Path to slashCommands relative to this file
@@ -16,8 +17,8 @@ export async function loadSlash(client: CustomClient) {
         const otherCategories = readdirSync(categoryPath);
         for (const otherCategory of otherCategories) {
             const otherCategoryPath = path.join(categoryPath, otherCategory);
-            const commandFiles = readdirSync(otherCategoryPath).filter((file) =>
-                file.endsWith(".ts") || file.endsWith(".js")
+            const commandFiles = readdirSync(otherCategoryPath).filter(
+                (file) => file.endsWith(".ts") || file.endsWith(".js")
             );
             for (const fileName of commandFiles) {
                 // Remove extension for the import to let Node/TS resolve it
@@ -31,11 +32,16 @@ export async function loadSlash(client: CustomClient) {
 
     for (const command of loadedCommands) {
         const commandData = command.default;
-        if (commandData.name || commandData.data?.name) {
+
+        // Skip command if it is explicitly disabled
+        if (commandData.enabled === false) {
+            const commandName = commandData.data?.name || commandData.name || "Desconocido";
+            console.info(`[INFO] El comando "/${commandName}" ha sido omitido porque está desactivado.`);
+        } else if (commandData.name || commandData.data?.name) {
             const commandName = commandData.data?.name || commandData.name;
             const commandPayload = commandData.data || commandData;
 
-            client.slashCommands.set(commandName, commandData);
+            client.slashCommands.set(commandName as string, commandData);
             commandObjects.push(commandPayload);
         } else {
             console.warn('[ADVERTENCIA] El comando fue omitido por no tener "name" o "data.name".');
