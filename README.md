@@ -85,10 +85,12 @@ El proyecto está organizado de forma modular utilizando TypeScript:
 ## 🚀 Cómo Empezar
 
 ### 1. Requisitos
+
 - [Node.js](https://nodejs.org/) (v18 o superior)
 - [MongoDB](https://www.mongodb.com/) (Instancia local o Atlas)
 
 ### 2. Instalación
+
 ```bash
 git clone https://github.com/anthofu/anthocito.git
 cd anthocito
@@ -96,7 +98,9 @@ npm install
 ```
 
 ### 3. Configuración
+
 Crea un archivo `.env` en la raíz del proyecto:
+
 ```env
 TOKEN=TU_TOKEN_DE_DISCORD_AQUI
 MONGODB_URI=TU_CONEXION_A_MONGODB
@@ -105,12 +109,15 @@ PORT=3000
 ```
 
 ### 4. Ejecución
+
 Para desarrollo (con recarga automática mediante `ts-node`):
+
 ```bash
 npm run dev
 ```
 
 Para producción (compilar y ejecutar):
+
 ```bash
 npm run build
 npm start

@@ -32,11 +32,16 @@ export async function loadSlash(client: CustomClient) {
 
     for (const command of loadedCommands) {
         const commandData = command.default;
-        if (commandData.name || commandData.data?.name) {
+
+        // Skip command if it is explicitly disabled
+        if (commandData.enabled === false) {
+            const commandName = commandData.data?.name || commandData.name || "Desconocido";
+            console.info(`[INFO] El comando "/${commandName}" ha sido omitido porque está desactivado.`);
+        } else if (commandData.name || commandData.data?.name) {
             const commandName = commandData.data?.name || commandData.name;
             const commandPayload = commandData.data || commandData;
 
-            client.slashCommands.set(commandName, commandData);
+            client.slashCommands.set(commandName as string, commandData);
             commandObjects.push(commandPayload);
         } else {
             console.warn('[ADVERTENCIA] El comando fue omitido por no tener "name" o "data.name".');

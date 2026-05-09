@@ -6,6 +6,12 @@ import { CustomClient } from "../index";
  */
 export interface SlashCommand {
     /**
+     * Define si el comando está habilitado o no.
+     * Si es falso, no se registrará en Discord.
+     */
+    enabled?: boolean;
+
+    /**
      * Nombre del comando (opcional si se usa 'data')
      */
     name?: string;
