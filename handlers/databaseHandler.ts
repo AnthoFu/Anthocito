@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { Logger } from "../utiles/Logger";
 
 /**
  * Función para cargar y conectar a la base de datos de MongoDB
@@ -12,9 +13,9 @@ export async function loadDatabase() {
 
     try {
         await mongoose.connect(mongoURI);
-        console.log(" | [MongoDB] ¡Conexión exitosa a la base de datos! :D ");
+        Logger.success("¡Conexión exitosa a la base de datos! :D");
     } catch (err) {
-        console.error(` | [MongoDB] Error al conectar a la base de datos :( => ${err}`);
+        Logger.error("Error al conectar a la base de datos :(", err);
         process.exit(1); // Salir si no hay DB, ya que el bot depende de ella
     }
 }
