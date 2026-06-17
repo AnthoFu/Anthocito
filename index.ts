@@ -33,7 +33,7 @@ client.on("ready", async () => {
         .then(() => {
             if (client.user) {
                 console.log(
-                    " | ¡Comandos cargado con exito! :D Puedes revisar los comandos en la carpeta slashCommands "
+                    " | ¡Comandos cargados con éxito! :D Puedes revisar los comandos en la carpeta slashCommands "
                 );
                 console.log(` | Bot encendido y en funcionamiento como: ${client.user.tag}`);
             }

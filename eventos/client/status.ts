@@ -12,7 +12,7 @@ export default {
     once: true,
 
     async execute(client: Client) {
-        console.log(" | Estado del bot cargado con exito. :3 Se puede modificar el archivo en status.js");
+        console.log(" | Estado del bot cargado con éxito. :3 Se puede modificar el archivo en status.ts");
 
         const statusarray: Status[] = [
             {
