@@ -7,6 +7,7 @@ import { loadSlash } from "./handlers/slashHandler";
 import { loadEvents } from "./handlers/eventHandler";
 import { loadDatabase } from "./handlers/databaseHandler";
 import { SlashCommand } from "./interfaces/Command";
+import { Logger } from "./utiles/Logger";
 
 config(); // Libreria requerida para poder guardar el token del bot en un archivo oculto (.env)
 
@@ -18,9 +19,18 @@ export class CustomClient extends Client {
 const client = new CustomClient({ intents: 3276799 });
 // Intents de administrador para el bot, basicamente todos los permisos
 
+// --- Manejo de errores globales para estabilidad ---
+process.on("unhandledRejection", (reason, promise) => {
+    Logger.error("Reconcimiento de promesa no manejada:", { promise, reason });
+});
+
+process.on("uncaughtException", (err, origin) => {
+    Logger.error("Excepción no capturada:", { err, origin });
+});
+
 (async () => {
     await loadDatabase(); // Iniciamos la conexión con MongoDB antes que todo :)
-    await client.login(process.env.TOKEN).catch((_err) => console.error(` | Error al iniciar el bot :( => ${_err}`));
+    await client.login(process.env.TOKEN).catch((_err) => Logger.error("Error al iniciar el bot :(", _err));
 })();
 
 loadEvents(client);
@@ -32,14 +42,12 @@ client.on("ready", async () => {
     await loadSlash(client)
         .then(() => {
             if (client.user) {
-                console.log(
-                    " | ¡Comandos cargados con éxito! :D Puedes revisar los comandos en la carpeta slashCommands "
-                );
-                console.log(` | Bot encendido y en funcionamiento como: ${client.user.tag}`);
+                Logger.success("¡Comandos cargados con éxito! :D");
+                Logger.info(`Bot encendido y en funcionamiento como: ${client.user.tag}`);
             }
         })
         .catch((_err) => {
-            console.error(` | Error al cargar los comandos, ahora que hiciste mal Antho? :( => ${_err}`);
+            Logger.error("Error al cargar los comandos, ahora que hiciste mal Antho? :(", _err);
         });
 });
 
@@ -52,5 +60,5 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.listen(port, () => {
-    console.log(` | Servidor web escuchando en el puerto ${port}`);
+    Logger.info(`Servidor web escuchando en el puerto ${port}`);
 });

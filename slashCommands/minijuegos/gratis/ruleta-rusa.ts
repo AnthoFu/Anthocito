@@ -179,7 +179,12 @@ export default {
             new ButtonBuilder().setCustomId("cancel_rr").setLabel("Cancelar").setStyle(ButtonStyle.Danger)
         );
 
-        const message = await interaction.reply({ embeds: [embed], components: [buttons], fetchReply: true });
+        const response = await interaction.reply({
+            embeds: [embed],
+            components: [buttons],
+            withResponse: true
+        });
+        const message = response.resource!.message!;
 
         const game: Game = {
             hostId: host.id,

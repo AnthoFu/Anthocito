@@ -1,4 +1,10 @@
-import { ChatInputCommandInteraction, ApplicationCommandData, ApplicationCommandDataResolvable } from "discord.js";
+import {
+    ChatInputCommandInteraction,
+    ApplicationCommandData,
+    ApplicationCommandDataResolvable,
+    ApplicationCommandOptionData,
+    PermissionResolvable
+} from "discord.js";
 import { CustomClient } from "../index";
 
 /**
@@ -20,6 +26,26 @@ export interface SlashCommand {
      * Descripción del comando (opcional si se usa 'data')
      */
     description?: string;
+
+    /**
+     * Opciones del comando (argumentos)
+     */
+    options?: ApplicationCommandOptionData[];
+
+    /**
+     * Tipo de comando (ChatInput, User, Message)
+     */
+    type?: number;
+
+    /**
+     * Permisos requeridos para usar el comando
+     */
+    defaultMemberPermissions?: PermissionResolvable;
+
+    /**
+     * Si el comando se puede usar en mensajes directos
+     */
+    dmPermission?: boolean;
 
     /**
      * Datos del comando para registrar en la API de Discord

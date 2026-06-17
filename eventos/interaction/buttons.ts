@@ -16,6 +16,11 @@ export default {
     async execute(interaction: Interaction, client: Client) {
         if (!interaction.isButton()) return;
 
+        // Solo manejar botones que pertenezcan al sistema de órdenes o vouch
+        if (!["aprobar", "rechazar", "vouch"].some((prefix) => interaction.customId.startsWith(prefix))) {
+            return;
+        }
+
         const [action, type, id] = interaction.customId.split("_");
         // type might be '40', '30' or the ID itself if action is 'rechazar'
 
