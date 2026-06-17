@@ -18,6 +18,15 @@ export class CustomClient extends Client {
 const client = new CustomClient({ intents: 3276799 });
 // Intents de administrador para el bot, basicamente todos los permisos
 
+// --- Manejo de errores globales para estabilidad ---
+process.on("unhandledRejection", (reason, promise) => {
+    console.error(" | [ERROR] Reconcimiento de promesa no manejada:", promise, "razón:", reason);
+});
+
+process.on("uncaughtException", (err, origin) => {
+    console.error(" | [ERROR] Excepción no capturada:", err, "en:", origin);
+});
+
 (async () => {
     await loadDatabase(); // Iniciamos la conexión con MongoDB antes que todo :)
     await client.login(process.env.TOKEN).catch((_err) => console.error(` | Error al iniciar el bot :( => ${_err}`));
