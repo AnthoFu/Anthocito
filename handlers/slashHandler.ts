@@ -32,19 +32,35 @@ export async function loadSlash(client: CustomClient) {
 
     for (const command of loadedCommands) {
         const commandData = command.default;
+        const { data } = commandData;
 
         // Skip command if it is explicitly disabled
         if (commandData.enabled === false) {
-            const commandName = commandData.data?.name || commandData.name || "Desconocido";
+            const commandName =
+                (data && "name" in data ? (data.name as string) : null) || commandData.name || "Desconocido";
             console.info(`[INFO] El comando "/${commandName}" ha sido omitido porque está desactivado.`);
-        } else if (commandData.name || commandData.data?.name) {
-            const commandName = commandData.data?.name || commandData.name;
-            const commandPayload = commandData.data || commandData;
-
-            client.slashCommands.set(commandName as string, commandData);
-            commandObjects.push(commandPayload);
         } else {
-            console.warn('[ADVERTENCIA] El comando fue omitido por no tener "name" o "data.name".');
+            const dataName = data && "name" in data ? (data.name as string) : null;
+
+            if (commandData.name || dataName) {
+                const commandName = (dataName || commandData.name) as string;
+
+                let commandPayload: ApplicationCommandDataResolvable;
+
+                if (data) {
+                    commandPayload = data;
+                } else {
+                    commandPayload = {
+                        name: commandData.name as string,
+                        description: commandData.description as string
+                    };
+                }
+
+                client.slashCommands.set(commandName, commandData);
+                commandObjects.push(commandPayload);
+            } else {
+                console.warn('[ADVERTENCIA] El comando fue omitido por no tener "name" o "data.name".');
+            }
         }
     }
     await client.application?.commands.set(commandObjects);
