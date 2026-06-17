@@ -56,10 +56,15 @@ export async function loadSlash(client: CustomClient) {
                     if (data) {
                         commandPayload = data;
                     } else {
+                        // Si no hay "data", construimos el payload con lo que haya en el root
                         commandPayload = {
-                            name: commandData.name as string,
-                            description: commandData.description as string
-                        };
+                            name: commandName,
+                            description: (commandData.description || "Sin descripción") as string,
+                            options: commandData.options || [],
+                            type: commandData.type || undefined,
+                            defaultMemberPermissions: commandData.defaultMemberPermissions || undefined,
+                            dmPermission: commandData.dmPermission !== undefined ? commandData.dmPermission : undefined
+                        } as ApplicationCommandDataResolvable;
                     }
 
                     client.slashCommands.set(commandName, commandData);
