@@ -4,19 +4,20 @@ import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
-    Client,
     ChatInputCommandInteraction,
     ComponentType,
     ButtonInteraction
 } from "discord.js";
+import { SlashCommand } from "../../../interfaces/Command";
+import { CustomClient } from "../../../index";
 
-export default {
+const command: SlashCommand = {
     name: "piedra-papel-tijeras", // Nombre del comando
     description: "Prueba tu suerte jugando el clásico piedra, papel o tijeras",
 
     // Descripción
 
-    async execute(client: Client, interaction: ChatInputCommandInteraction) {
+    async execute(client: CustomClient, interaction: ChatInputCommandInteraction) {
         // Crear un Embed para las instrucciones del juego
         const embed = new EmbedBuilder()
             .setColor(0x00ae86)
@@ -77,4 +78,5 @@ export default {
         }
     }
 };
-/* eslint-enable max-len */
+
+export default command;

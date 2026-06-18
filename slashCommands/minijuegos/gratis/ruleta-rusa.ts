@@ -4,7 +4,6 @@ import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
-    Client,
     ChatInputCommandInteraction,
     User,
     Message,
@@ -14,6 +13,8 @@ import {
     TextChannel,
     ComponentType
 } from "discord.js";
+import { SlashCommand } from "../../../interfaces/Command";
+import { CustomClient } from "../../../index";
 
 //! Este código todavía esta en desarrollo
 
@@ -147,11 +148,11 @@ async function startGame(game: Game) {
     nextTurn(game);
 }
 
-export default {
+const command: SlashCommand = {
     name: "ruletarusa",
     description: "Inicia un juego de ruleta rusa al que otros pueden unirse.",
 
-    async execute(client: Client, interaction: ChatInputCommandInteraction) {
+    async execute(client: CustomClient, interaction: ChatInputCommandInteraction) {
         // Comprobar si ya hay un juego en este canal
         if (activeGames.has(interaction.channel!.id)) {
             await interaction.reply({
@@ -262,4 +263,5 @@ export default {
         });
     }
 };
-/* eslint-enable no-param-reassign */
+
+export default command;

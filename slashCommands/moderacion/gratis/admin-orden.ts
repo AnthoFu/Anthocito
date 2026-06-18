@@ -4,12 +4,13 @@ import {
     PermissionFlagsBits,
     ActionRowBuilder,
     StringSelectMenuBuilder,
-    Client,
     ChatInputCommandInteraction
 } from "discord.js";
 import OrderSchema, { IOrder } from "../../../models/OrderSchema";
+import { SlashCommand } from "../../../interfaces/Command";
+import { CustomClient } from "../../../index";
 
-export default {
+const command: SlashCommand = {
     data: new SlashCommandBuilder()
         .setName("admin-orden")
         .setDescription("Gestiona las órdenes de cashback de los usuarios.")
@@ -21,7 +22,7 @@ export default {
             subcommand.setName("panel-pagos").setDescription("Muestra el panel para pagar órdenes aprobadas.")
         ),
 
-    async execute(client: Client, interaction: ChatInputCommandInteraction) {
+    async execute(client: CustomClient, interaction: ChatInputCommandInteraction) {
         const subcommand = interaction.options.getSubcommand();
 
         if (subcommand === "panel") {
@@ -108,3 +109,5 @@ export default {
         return null;
     }
 };
+
+export default command;

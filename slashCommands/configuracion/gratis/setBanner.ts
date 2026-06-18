@@ -1,7 +1,9 @@
-import { ApplicationCommandOptionType, Client, ChatInputCommandInteraction } from "discord.js";
+import { ApplicationCommandOptionType, ChatInputCommandInteraction } from "discord.js";
 import fetch from "node-fetch";
+import { SlashCommand } from "../../../interfaces/Command";
+import { CustomClient } from "../../../index";
 
-export default {
+const command: SlashCommand = {
     name: "setbanner",
     description: "Cambiar el banner del perfil del bot, solo el Antho puede hacerlo",
     options: [
@@ -13,7 +15,7 @@ export default {
         }
     ],
 
-    async execute(client: Client, interaction: ChatInputCommandInteraction) {
+    async execute(client: CustomClient, interaction: ChatInputCommandInteraction) {
         // Verificar si el ID del usuario coincide con el SUPER_ADMIN_ID en el .env
         if (interaction.user.id !== process.env.SUPER_ADMIN_ID) {
             await interaction.reply({ content: "No tienes permiso para usar este comando.", ephemeral: true });
@@ -48,6 +50,8 @@ export default {
             await interaction.editReply({ content: "Ocurrió un error al intentar cambiar el banner." });
         }
 
-        console.log(` | Se ha utilizado el comando ${this.name}`);
+        console.log(` | Se ha utilizado el comando ${command.name}`);
     }
 };
+
+export default command;

@@ -3,12 +3,13 @@ import {
     PermissionFlagsBits,
     ChannelType,
     EmbedBuilder,
-    Client,
     ChatInputCommandInteraction
 } from "discord.js";
+import { SlashCommand } from "../../../interfaces/Command";
+import { CustomClient } from "../../../index";
 import WelcomeSchema, { IWelcome } from "../../../models/WelcomeSchema";
 
-export default {
+const command: SlashCommand = {
     data: new SlashCommandBuilder()
         .setName("setwelcome")
         .setDescription("Configura el sistema de bienvenidas del servidor.")
@@ -30,7 +31,7 @@ export default {
                 .setRequired(false)
         ),
 
-    async execute(client: Client, interaction: ChatInputCommandInteraction) {
+    async execute(client: CustomClient, interaction: ChatInputCommandInteraction) {
         const { guild } = interaction;
 
         // Usamos directamente interaction.options para evitar errores de tipo
@@ -70,3 +71,5 @@ export default {
         return interaction.reply({ embeds: [embed], ephemeral: true });
     }
 };
+
+export default command;

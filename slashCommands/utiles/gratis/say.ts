@@ -1,6 +1,8 @@
-import { ApplicationCommandOptionType, Client, ChatInputCommandInteraction } from "discord.js";
+import { ApplicationCommandOptionType, ChatInputCommandInteraction } from "discord.js";
+import { SlashCommand } from "../../../interfaces/Command";
+import { CustomClient } from "../../../index";
 
-export default {
+const command: SlashCommand = {
     name: "say",
     description: "El bot dirá lo que tú quieras.",
     options: [
@@ -12,8 +14,10 @@ export default {
         }
     ],
 
-    async execute(client: Client, interaction: ChatInputCommandInteraction) {
+    async execute(client: CustomClient, interaction: ChatInputCommandInteraction) {
         const botRespuesta = interaction.options.getString("mensaje")!;
         await interaction.reply(botRespuesta);
     }
 };
+
+export default command;

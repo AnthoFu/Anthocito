@@ -3,12 +3,13 @@ import {
     EmbedBuilder,
     ActionRowBuilder,
     StringSelectMenuBuilder,
-    Client,
     ChatInputCommandInteraction
 } from "discord.js";
+import { SlashCommand } from "../../../interfaces/Command";
+import { CustomClient } from "../../../index";
 import OrderSchema, { IOrder } from "../../../models/OrderSchema";
 
-export default {
+const command: SlashCommand = {
     data: new SlashCommandBuilder()
         .setName("orden")
         .setDescription("Gestiona tus órdenes de cashback.")
@@ -47,7 +48,7 @@ export default {
                 )
         ),
 
-    async execute(client: Client, interaction: ChatInputCommandInteraction) {
+    async execute(client: CustomClient, interaction: ChatInputCommandInteraction) {
         const subcommand = interaction.options.getSubcommand();
 
         if (subcommand === "nueva") {
@@ -190,3 +191,5 @@ export default {
         return null;
     }
 };
+
+export default command;

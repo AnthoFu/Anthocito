@@ -1,13 +1,15 @@
-import { SlashCommandBuilder, EmbedBuilder, Client, ChatInputCommandInteraction } from "discord.js";
+import { SlashCommandBuilder, EmbedBuilder, ChatInputCommandInteraction } from "discord.js";
 import fs from "fs";
 import path from "path";
+import { SlashCommand } from "../../../interfaces/Command";
+import { CustomClient } from "../../../index";
 
-export default {
+const command: SlashCommand = {
     data: new SlashCommandBuilder()
         .setName("help")
         .setDescription("Muestra todos los comandos disponibles en un embed."),
 
-    async execute(client: Client, interaction: ChatInputCommandInteraction) {
+    async execute(client: CustomClient, interaction: ChatInputCommandInteraction) {
         try {
             const embed = new EmbedBuilder()
                 .setTitle("📜 Menú de Ayuda")
@@ -61,3 +63,5 @@ export default {
         }
     }
 };
+
+export default command;

@@ -1,14 +1,15 @@
 import {
     ApplicationCommandOptionType,
     ChannelType,
-    Client,
     ChatInputCommandInteraction,
     GuildMember,
     Message,
     TextChannel
 } from "discord.js";
+import { SlashCommand } from "../../../interfaces/Command";
+import { CustomClient } from "../../../index";
 
-export default {
+const command: SlashCommand = {
     name: "clear",
     description: "Borrar la cantidad de mensajes que coloques",
     options: [
@@ -35,7 +36,7 @@ export default {
         }
     ],
 
-    async execute(client: Client, interaction: ChatInputCommandInteraction) {
+    async execute(client: CustomClient, interaction: ChatInputCommandInteraction) {
         const cantidad = interaction.options.getNumber("cantidad")!;
         const usuario = interaction.options.getUser("usuario");
         const canal = (interaction.options.getChannel("canal") || interaction.channel) as TextChannel;
@@ -71,3 +72,5 @@ export default {
         }
     }
 };
+
+export default command;

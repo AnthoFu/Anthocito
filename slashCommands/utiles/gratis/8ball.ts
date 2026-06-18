@@ -1,6 +1,8 @@
-import { ApplicationCommandOptionType, Client, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
+import { SlashCommand } from "../../../interfaces/Command";
+import { CustomClient } from "../../../index";
 
-export default {
+const command: SlashCommand = {
     name: "8ball",
     description: "Deja que anthocito responda tu pregunta. owo",
     options: [
@@ -12,7 +14,7 @@ export default {
         }
     ],
 
-    async execute(client: Client, interaction: ChatInputCommandInteraction) {
+    async execute(client: CustomClient, interaction: ChatInputCommandInteraction) {
         const pgr = interaction.options.getString("pregunta")!;
 
         const respuestas = [
@@ -40,3 +42,5 @@ export default {
         await interaction.reply({ embeds: [embed] });
     }
 };
+
+export default command;
